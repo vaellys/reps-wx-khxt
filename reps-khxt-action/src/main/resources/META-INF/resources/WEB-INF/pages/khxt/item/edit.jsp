@@ -15,7 +15,7 @@
 				<reps:select dataSource="${categoryMap}" id="categoryId" name="khxtCategory.id" required="true" style="width:304px">${item.khxtCategory.id }</reps:select>
 			</reps:formfield>
 			<reps:formfield label="指标名称" fullRow="true">
-				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:300px">${item.name }</reps:input>
+				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:300px" readonly="true">${item.name }</reps:input>
 			</reps:formfield>
 			<reps:formfield label="分数" fullRow="true">
 				<reps:input name="point" dataType="moneyvalidate" maxLength="6" required="true" style="width:300px">${item.point }</reps:input>

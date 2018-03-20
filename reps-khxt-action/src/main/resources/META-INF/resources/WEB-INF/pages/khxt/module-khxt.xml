@@ -48,7 +48,10 @@
 							<action>/reps/khxt/level/delete.mvc;</action>
 						</node>
 						<node code="khxt010304" name="选择级别人员" showOrder="4" newpage="false" type="Operate">
-							<action>/reps/khxt/levelperson/list.mvc;/reps/khxt/levelperson/save.mvc;</action>
+							<action>/reps/khxt/levelperson/list.mvc;/reps/khxt/levelperson/save.mvc;/reps/khxt/levelperson/delete.mvc;/reps/khxt/levelperson/multiple.mvc;</action>
+						</node>
+						<node code="khxt010305" name="级别详细" showOrder="5" newpage="false" type="Operate">
+							<action>/reps/khxt/level/show.mvc</action>
 						</node>
 					</nodes>
 				</node>
