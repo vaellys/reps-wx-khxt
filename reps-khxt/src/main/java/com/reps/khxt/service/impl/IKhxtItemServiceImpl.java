@@ -1,0 +1,120 @@
+package com.reps.khxt.service.impl;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.reps.core.exception.RepsException;
+import com.reps.core.orm.ListResult;
+import com.reps.core.util.StringUtil;
+import com.reps.khxt.dao.KhxtItemDao;
+import com.reps.khxt.entity.KhxtCategory;
+import com.reps.khxt.entity.KhxtItem;
+import com.reps.khxt.service.IKhxtItemService;
+
+@Service
+@Transactional
+public class IKhxtItemServiceImpl implements IKhxtItemService {
+	
+	protected final Logger logger = LoggerFactory.getLogger(IKhxtItemServiceImpl.class);
+	
+	@Autowired
+	KhxtItemDao dao;
+
+	@Override
+	public void save(KhxtItem khxtItem) throws RepsException {
+		if(null == khxtItem) {
+			throw new RepsException("数据异常");
+		}
+		if(!this.checkItemNameExists(khxtItem)) {
+			dao.save(khxtItem);
+		} else {
+			throw new RepsException("指标名称已存在，请重新输入");
+		}
+	}
+
+	@Override
+	public void delete(KhxtItem khxtItem) throws RepsException {
+		if(null == khxtItem) {
+			throw new RepsException("参数异常");
+		}
+		String id = khxtItem.getId();
+		if(StringUtil.isBlank(id)) {
+			throw new RepsException("参数异常:ID为空");
+		}
+		dao.delete(khxtItem);
+	}
+
+	@Override
+	public void update(KhxtItem khxtItem) throws RepsException {
+		if(null == khxtItem) {
+			throw new RepsException("参数异常");
+		}
+		KhxtItem item = dao.get(khxtItem.getId());
+		String name = khxtItem.getName();
+		if(StringUtil.isNotBlank(name)) {
+			item.setName(name);
+		}
+		Double point = khxtItem.getPoint();
+		if(null != point) {
+			item.setPoint(point);
+		}
+		KhxtCategory khxtCategory = khxtItem.getKhxtCategory();
+		if(null != khxtCategory) {
+			item.setKhxtCategory(khxtCategory);
+		}
+		dao.update(item);
+	}
+
+	@Override
+	public KhxtItem get(String id) throws RepsException {
+		if(StringUtil.isBlank(id)) {
+			throw new RepsException("参数异常:类别ID不能为空");
+		}
+		KhxtItem khxtItem = dao.get(id);
+		if(null == khxtItem) {
+			throw new RepsException("参数异常:类别ID无效");
+		}
+		return dao.get(id);
+	}
+
+	@Override
+	public ListResult<KhxtItem> query(int start, int pagesize, KhxtItem khxtItem) {
+		return dao.query(start, pagesize, khxtItem);
+	}
+
+	@Override
+	public boolean checkItemExistInCategory(String cid) throws RepsException {
+		if(StringUtil.isBlank(cid)) {
+			throw new RepsException("参数异常:请指定类别ID");
+		}
+		KhxtItem item = new KhxtItem();
+		item.setCategoryId(cid);
+		List<KhxtItem> itemList = dao.find(item);
+		if(null == itemList || itemList.isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	@Override
+	public boolean checkItemNameExists(KhxtItem khxtItem) throws RepsException {
+		String name = khxtItem.getName();
+		if(StringUtil.isNotBlank(name)) {
+			List<KhxtItem> list = dao.find(khxtItem);
+			if(null == list || list.isEmpty()) {
+				return false;
+			}else {
+				return true;
+			}
+		} 
+		return false;
+	}
+
+}

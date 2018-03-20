@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="khxt" title="教育局人员考核系统" showOrder="80" icon="school-icon">
+	<description></description>
+	<menu>
+		<node code="khxt010000" name="基础设置" type="Catalog" showOrder="1" icon="basicdata" newpage="false">
+			<nodes>
+				<node code="khxt010100" name="指标分类设置" showOrder="1" newpage="false" type="Action" >
+					<action>/reps/khxt/category/list.mvc</action>
+					<nodes>
+						<node code="khxt010101" name="新增分类" showOrder="1" newpage="false" type="Operate">
+							<action>/reps/khxt/category/toadd.mvc;/reps/khxt/category/add.mvc</action>
+						</node>
+						<node code="khxt010102" name="修改分类" showOrder="2" newpage="false" type="Operate">
+							<action>/reps/khxt/category/toedit.mvc;/reps/khxt/category/edit.mvc</action>
+						</node>
+						<node code="khxt010103" name="删除分类" showOrder="3" newpage="false" type="Operate">
+							<action>/reps/khxt/category/delete.mvc</action>
+						</node>
+					</nodes>
+				</node>				
+				<node code="khxt010200" name="指标设置" showOrder="2" newpage="false" type="Action" >
+					<action>/reps/khxt/item/list.mvc</action>
+					<nodes>
+						<node code="khxt010201" name="新增指标" showOrder="1" newpage="false" type="Operate">
+							<action>/reps/khxt/item/toadd.mvc;/reps/khxt/item/add.mvc;</action>
+						</node>
+						<node code="khxt010202" name="修改指标" showOrder="2" newpage="false" type="Operate">
+							<action>/reps/khxt/item/toedit.mvc;/reps/khxt/item/edit.mvc</action>
+						</node>
+						<node code="khxt010203" name="删除指标" showOrder="3" newpage="false" type="Operate">
+							<action>/reps/khxt/item/delete.mvc;</action>
+						</node>
+						<node code="khxt010204" name="指标详细" showOrder="4" newpage="false" type="Operate">
+							<action>/reps/khxt/item/show.mvc</action>
+						</node>
+					</nodes>
+				</node>
+				<node code="khxt010300" name="考核级别设置" showOrder="3" newpage="false" type="Action" >
+					<action>/reps/khxt/level/list.mvc</action>
+					<nodes>
+						<node code="khxt010301" name="新增级别" showOrder="1" newpage="false" type="Operate">
+							<action>/reps/khxt/level/toadd.mvc;/reps/khxt/level/add.mvc;</action>
+						</node>
+						<node code="khxt010302" name="修改级别" showOrder="2" newpage="false" type="Operate">
+							<action>/reps/khxt/level/toedit.mvc;/reps/khxt/level/edit.mvc</action>
+						</node>
+						<node code="khxt010303" name="删除级别" showOrder="3" newpage="false" type="Operate">
+							<action>/reps/khxt/level/delete.mvc;</action>
+						</node>
+						<node code="khxt010304" name="选择级别人员" showOrder="4" newpage="false" type="Operate">
+							<action>/reps/khxt/levelperson/list.mvc;/reps/khxt/levelperson/save.mvc;</action>
+						</node>
+					</nodes>
+				</node>
+			</nodes>
+		</node>
+	</menu>
+	<consts>
+	<citem name="imageUploadPath" value="z:" />
+	</consts>
+</module>
