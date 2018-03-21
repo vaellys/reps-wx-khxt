@@ -18,9 +18,9 @@ import com.reps.khxt.service.IKhxtLevelService;
 @Service
 @Transactional
 public class IKhxtLevelServiceImpl implements IKhxtLevelService {
-	
+
 	protected final Logger logger = LoggerFactory.getLogger(IKhxtLevelServiceImpl.class);
-	
+
 	@Autowired
 	KhxtLevelDao dao;
 	

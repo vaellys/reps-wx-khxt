@@ -20,22 +20,22 @@ import com.reps.khxt.entity.KhxtLevel;
  */
 @Repository
 public class KhxtLevelDao {
-	
+
 	@Autowired
 	IGenericDao<KhxtLevel> dao;
-	
+
 	public void save(KhxtLevel khxtLevel) {
 		dao.save(khxtLevel);
 	}
-	
+
 	public void delete(KhxtLevel khxtLevel) {
 		dao.delete(khxtLevel);
 	}
-	
+
 	public void update(KhxtLevel khxtLevel) {
 		dao.update(khxtLevel);
 	}
-	
+
 	public KhxtLevel get(String id) {
 		return dao.get(KhxtLevel.class, id);
 	}
@@ -44,11 +44,10 @@ public class KhxtLevelDao {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevel.class);
 		if (null != khxtLevel) {
 			String name = khxtLevel.getName();
-			if(StringUtil.isNotBlank(name)) {
+			if (StringUtil.isNotBlank(name)) {
 				dc.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
 			}
 		}
 		return dao.query(dc, start, pagesize, Order.asc("name"));
 	}
-	
 }

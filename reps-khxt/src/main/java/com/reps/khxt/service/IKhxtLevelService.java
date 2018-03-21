@@ -11,38 +11,43 @@ import com.reps.khxt.entity.KhxtLevel;
  * @date 2018年3月14日 上午9:36:26
  */
 public interface IKhxtLevelService {
-	
+
 	/**
 	 * 添加级别
+	 * 
 	 * @param khxtLevel
 	 * @throws RepsException
 	 */
 	public void save(KhxtLevel khxtLevel) throws RepsException;
-	
+
 	/**
 	 * 删除级别
+	 * 
 	 * @param khxtLevel
 	 * @throws RepsException
 	 */
 	public void delete(KhxtLevel khxtLevel) throws RepsException;
-	
+
 	/**
 	 * 修改级别
+	 * 
 	 * @param khxtLevel
 	 * @throws RepsException
 	 */
 	public void update(KhxtLevel khxtLevel) throws RepsException;
-	
+
 	/**
 	 * 查询级别
+	 * 
 	 * @param id
 	 * @return khxtLevel
 	 * @throws RepsException
 	 */
 	public KhxtLevel get(String id) throws RepsException;
-	
+
 	/**
 	 * 查询级别带分页参数
+	 * 
 	 * @param start
 	 * @param pagesize
 	 * @param khxtItem
