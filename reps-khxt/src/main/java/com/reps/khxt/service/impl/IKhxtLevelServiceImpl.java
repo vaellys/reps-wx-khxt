@@ -1,5 +1,7 @@
 package com.reps.khxt.service.impl;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -84,10 +86,24 @@ public class IKhxtLevelServiceImpl implements IKhxtLevelService {
 	@Override
 	public ListResult<KhxtLevel> query(int start, int pagesize, KhxtLevel khxtLevel) {
 		ListResult<KhxtLevel> listResult = dao.query(start, pagesize, khxtLevel);
-		for (KhxtLevel level : listResult.getList()) {
-			level.setPersonNames(khxtLevelPersonService.joinLevelPersonName(level.getId()));
-		}
+		//设置级别人员名字
+		setLevelPersonNames(listResult.getList());
 		return listResult;
+	}
+	
+	private void setLevelPersonNames(List<KhxtLevel> list) {
+		if(null != list && !list.isEmpty()) {
+			for (KhxtLevel level : list) {
+				level.setPersonNames(khxtLevelPersonService.joinLevelPersonName(level.getId()));
+			}
+		}
+	}
+
+	@Override
+	public List<KhxtLevel> findAll() throws RepsException {
+		List<KhxtLevel> allList = dao.find();
+		setLevelPersonNames(allList);
+		return allList;
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.reps.khxt.dao;
 
+import java.util.List;
+
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -48,6 +50,13 @@ public class KhxtLevelDao {
 				dc.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
 			}
 		}
-		return dao.query(dc, start, pagesize, Order.asc("name"));
+		return dao.query(dc, start, pagesize, Order.asc("level"));
 	}
+	
+	public List<KhxtLevel> find() {
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevel.class);
+		dc.addOrder(Order.asc("level"));
+		return dao.findByCriteria(dc);
+	}
+	
 }

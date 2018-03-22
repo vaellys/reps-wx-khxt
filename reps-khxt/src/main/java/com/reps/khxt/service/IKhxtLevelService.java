@@ -1,5 +1,7 @@
 package com.reps.khxt.service;
 
+import java.util.List;
+
 import com.reps.core.exception.RepsException;
 import com.reps.core.orm.ListResult;
 import com.reps.khxt.entity.KhxtLevel;
@@ -54,5 +56,12 @@ public interface IKhxtLevelService {
 	 * @return ListResult<KhxtLevel>
 	 */
 	public ListResult<KhxtLevel> query(int start, int pagesize, KhxtLevel khxtLevel);
+	
+	/**
+	 * 查询所有级别
+	 * @return List<KhxtLevel>
+	 * @throws RepsException
+	 */
+	public List<KhxtLevel> findAll() throws RepsException;
 
 }

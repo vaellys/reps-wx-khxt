@@ -51,6 +51,7 @@ public class KhxtLevelPersonAction extends BaseAction {
 		ModelAndView mav = getModelAndView("/khxt/levelperson/list");
 		ListResult<KhxtLevelPerson> listResult = khxtLevelPersonService.query(pager.getStartRow(), pager.getPageSize(), khxtLevelPerson);
 		mav.addObject("levelId", khxtLevelPerson.getLevelId());
+		mav.addObject("levelPerson", khxtLevelPerson);
 		// 分页数据
 		mav.addObject("list", listResult.getList());
 		// 分页参数

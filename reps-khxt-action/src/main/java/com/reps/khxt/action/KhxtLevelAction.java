@@ -19,7 +19,6 @@ import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
 import com.reps.khxt.entity.KhxtCategory;
 import com.reps.khxt.entity.KhxtLevel;
-import com.reps.khxt.entity.KhxtLevelPerson;
 import com.reps.khxt.service.IKhxtCategoryService;
 import com.reps.khxt.service.IKhxtLevelPersonService;
 import com.reps.khxt.service.IKhxtLevelService;
@@ -139,18 +138,6 @@ public class KhxtLevelAction extends BaseAction {
 			logger.error("获取详情失败", e);
 			return ajax(AjaxStatus.ERROR, e.getMessage());
 		}
-	}
-	
-	@RequestMapping(value = "/listperson")
-	public ModelAndView list(Pagination pager, KhxtLevelPerson khxtLevelPerson) {
-		ModelAndView mav = getModelAndView("/khxt/level/listperson");
-		ListResult<KhxtLevelPerson> listResult = khxtLevelPersonService.query(pager.getStartRow(), pager.getPageSize(), khxtLevelPerson);
-		// 分页数据
-		mav.addObject("list", listResult.getList());
-		// 分页参数
-		pager.setTotalRecord(listResult.getCount().longValue());
-		mav.addObject("pager", pager);
-		return mav;
 	}
 
 }

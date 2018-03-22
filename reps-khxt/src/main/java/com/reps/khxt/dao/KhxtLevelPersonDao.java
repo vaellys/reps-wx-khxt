@@ -63,7 +63,11 @@ public class KhxtLevelPersonDao {
 			}
 			String personName = khxtLevelPerson.getPersonName();
 			if (StringUtil.isNotBlank(personName)) {
-				dc.add(Restrictions.like("personName", personName));
+				dc.add(Restrictions.like("personName", personName, MatchMode.ANYWHERE));
+			}
+			String levelId = khxtLevelPerson.getLevelId();
+			if (StringUtil.isNotBlank(levelId)) {
+				dc.add(Restrictions.like("levelId", levelId));
 			}
 		}
 		return dao.query(dc, start, pagesize, Order.asc("levelId"));

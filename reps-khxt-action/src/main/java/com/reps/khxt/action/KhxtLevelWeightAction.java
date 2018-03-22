@@ -14,8 +14,13 @@ import com.reps.core.orm.ListResult;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
 import com.reps.khxt.entity.KhxtCategory;
+import com.reps.khxt.entity.KhxtLevel;
 import com.reps.khxt.entity.KhxtLevelWeight;
+import com.reps.khxt.service.IKhxtLevelService;
 import com.reps.khxt.service.IKhxtLevelWeightService;
+import static com.reps.khxt.util.WeightUtil.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(value = RepsConstant.ACTION_BASE_PATH + "/khxt/levelweight")
@@ -25,6 +30,9 @@ public class KhxtLevelWeightAction extends BaseAction {
 
 	@Autowired
 	IKhxtLevelWeightService khxtLevelWeightService;
+	
+	@Autowired
+	IKhxtLevelService khxtLevelService;
 
 	@RequestMapping(value = "/list")
 	public ModelAndView list(Pagination pager, KhxtLevelWeight khxtLevelWeight) {
@@ -42,6 +50,9 @@ public class KhxtLevelWeightAction extends BaseAction {
 	public Object toAdd(KhxtCategory khxtCategory) {
 		ModelAndView mav = getModelAndView("/khxt/levelweight/add");
 		try {
+			List<KhxtLevel> levelList = khxtLevelService.findAll();
+			mav.addObject("applyYearMap", APPLY_YEAR_RANGE);
+			mav.addObject("levelList", levelList);
 			return mav;
 		} catch (Exception e) {
 			e.printStackTrace();
