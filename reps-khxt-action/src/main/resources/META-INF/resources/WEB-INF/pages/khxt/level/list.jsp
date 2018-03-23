@@ -29,7 +29,7 @@
 				<reps:gridfield title="人员" width="25" align="center">${level.personNames}</reps:gridfield>
 				<reps:gridfield title="权限" width="15" align="center"><c:if test="${level.power == '1'}">是考核人</c:if><c:if test="${level.power == '2'}">是被考核人</c:if><c:if test="${level.power == '3'}">是考核人，也是被考核人</c:if></reps:gridfield>
 				<reps:gridfield title="操作" width="25">
-					<reps:button cssClass="detail-table" action="show.mvc?id=${level.id }" value="详细"></reps:button>
+					<reps:button cssClass="detail-table" action="show.mvc?id=${level.id }" value="查看"></reps:button>
 					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${level.id}"></reps:button>
 					<reps:button cssClass="add-table" value="添加人员" action="../levelperson/list.mvc?levelId=${level.id}"></reps:button>
 					<reps:ajax cssClass="delete-table" messageCode="manage.action.delete" confirm="您确定要删除所选行吗？"

@@ -29,7 +29,10 @@
 				<reps:gridfield title="公开打分明细" width="15" align="center"><c:if test="${levelWeight.visible == '1'}">可见</c:if><c:if test="${levelWeight.visible == '0'}">不可见</c:if></reps:gridfield>
 				<reps:gridfield title="考核权重" width="30" align="center">${levelWeight.weightDisplay}</reps:gridfield>
 				<reps:gridfield title="操作" width="25">
-					<reps:button cssClass="detail-table" action="show.mvc?id=${levelWeight.id }" value="详细"></reps:button>
+					<reps:ajax cssClass="copy-table" value="复制" confirm="您确定要复制吗？"
+						callBack="my" url="copy.mvc?id=${levelWeight.id}">
+					</reps:ajax>
+					<reps:button cssClass="detail-table" action="show.mvc?id=${levelWeight.id }" value="查看"></reps:button>
 					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${levelWeight.id}"></reps:button>
 					<reps:ajax cssClass="delete-table" messageCode="manage.action.delete" confirm="您确定要删除所选行吗？"
 						callBack="my" url="delete.mvc?id=${levelWeight.id}">

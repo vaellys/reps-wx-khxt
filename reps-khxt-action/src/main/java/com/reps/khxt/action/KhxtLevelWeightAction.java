@@ -127,5 +127,18 @@ public class KhxtLevelWeightAction extends BaseAction {
 			return ajax(AjaxStatus.ERROR, e.getMessage());
 		}
 	}
+	
+	@RequestMapping(value = "/copy")
+	@ResponseBody
+	public Object copy(String id) {
+		try {
+			khxtLevelWeightService.copy(id);
+			return ajax(AjaxStatus.OK, "复制成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("复制失败", e);
+			return ajax(AjaxStatus.ERROR, e.getMessage());
+		}
+	}
 
 }

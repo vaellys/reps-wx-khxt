@@ -31,7 +31,7 @@
 				<reps:gridfield title="所属类别" width="30" align="center">${item.khxtCategory.name}</reps:gridfield>
 				<reps:gridfield title="分数" width="15" align="center">${item.point}</reps:gridfield>
 				<reps:gridfield title="操作" width="25">
-					<reps:button cssClass="detail-table" action="show.mvc?id=${item.id }" value="详细"></reps:button>
+					<reps:button cssClass="detail-table" action="show.mvc?id=${item.id }" value="查看"></reps:button>
 					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${item.id}"></reps:button>
 					<reps:ajax cssClass="delete-table" messageCode="manage.action.delete" confirm="您确定要删除所选行吗？"
 						callBack="my" url="delete.mvc?id=${item.id}">

@@ -50,4 +50,11 @@ public interface IKhxtLevelWeightService {
 	 */
 	public ListResult<KhxtLevelWeight> query(int start, int pagesize, KhxtLevelWeight khxtLevelWeight);
 	
+	/**
+	 * 复制当前权重
+	 * @param id
+	 * @throws RepsException
+	 */
+	public void copy(String id) throws RepsException;
+	
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.reps.core.orm.IGenericDao;
 import com.reps.core.orm.ListResult;
+import com.reps.core.util.IDGenerator;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.entity.KhxtLevelWeight;
 
@@ -63,6 +64,13 @@ public class KhxtLevelWeightDao {
 			}
 		}
 		return dao.findByCriteria(dc);
+	}
+	
+	public void insert(String id) {
+		if(StringUtil.isNotBlank(id)) {
+			String hql = "insert into " + KhxtLevelWeight.class.getName() + "(id, name, year, weight, visible) select '" + IDGenerator.UUID() + "',CONCAT(t.name, '_副本'),t.year,t.weight,t.visible from " + KhxtLevelWeight.class.getName() + " t where t.id='" + id + "'";
+			dao.getSession().createQuery(hql).executeUpdate();
+		}
 	}
 	
 }
