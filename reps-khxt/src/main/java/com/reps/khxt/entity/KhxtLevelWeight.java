@@ -5,7 +5,9 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reps.core.orm.IdEntity;
 
 
@@ -37,6 +39,10 @@ public class KhxtLevelWeight extends IdEntity implements Serializable {
 	/** 是否公开打分明细 */
 	@Column(name = "visible")
 	private Short visible;
+	
+	@Transient
+	@JsonIgnore
+	private String weightDisplay;
 
 	public String getName() {
 		return name;
@@ -68,6 +74,14 @@ public class KhxtLevelWeight extends IdEntity implements Serializable {
 
 	public void setVisible(Short visible) {
 		this.visible = visible;
+	}
+
+	public String getWeightDisplay() {
+		return weightDisplay;
+	}
+
+	public void setWeightDisplay(String weightDisplay) {
+		this.weightDisplay = weightDisplay;
 	}
 	
 }

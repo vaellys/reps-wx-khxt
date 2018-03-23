@@ -13,7 +13,7 @@
 			<reps:formcontent parentLayout="true" style="width:80%;">
 				<reps:formfield label="名称" labelStyle="width:20%;"
 					textStyle="width:27%;">
-					<reps:input name="name" maxLength="20">${level.name }</reps:input>
+					<reps:input name="personName" maxLength="20">${levelPerson.personName }</reps:input>
 				</reps:formfield>
 			</reps:formcontent>
 			<reps:querybuttons>

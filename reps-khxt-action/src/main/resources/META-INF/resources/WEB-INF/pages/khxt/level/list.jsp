@@ -27,7 +27,7 @@
 				<reps:gridfield title="级别名称" width="15" align="center">${level.name}</reps:gridfield>
 				<reps:gridfield title="级别" width="15" align="center"><c:if test="${level.level == '1'}">一级</c:if><c:if test="${level.level == '2'}">二级</c:if><c:if test="${level.level == '3'}">三级</c:if><c:if test="${level.level == '4'}">四级</c:if><c:if test="${level.level == '5'}">五级</c:if><c:if test="${level.level == '6'}">六级</c:if></reps:gridfield>
 				<reps:gridfield title="人员" width="25" align="center">${level.personNames}</reps:gridfield>
-				<reps:gridfield title="权限" width="15" align="center"><c:if test="${level.level == '1'}">是考核人</c:if><c:if test="${level.level == '2'}">是被考核人</c:if><c:if test="${level.level == '3'}">是考核人，也是被考核人</c:if></reps:gridfield>
+				<reps:gridfield title="权限" width="15" align="center"><c:if test="${level.power == '1'}">是考核人</c:if><c:if test="${level.power == '2'}">是被考核人</c:if><c:if test="${level.power == '3'}">是考核人，也是被考核人</c:if></reps:gridfield>
 				<reps:gridfield title="操作" width="25">
 					<reps:button cssClass="detail-table" action="show.mvc?id=${level.id }" value="详细"></reps:button>
 					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${level.id}"></reps:button>

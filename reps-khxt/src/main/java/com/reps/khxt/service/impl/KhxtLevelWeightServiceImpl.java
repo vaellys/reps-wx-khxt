@@ -1,5 +1,7 @@
 package com.reps.khxt.service.impl;
 
+import java.util.Iterator;
+
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -11,8 +13,13 @@ import com.reps.core.exception.RepsException;
 import com.reps.core.orm.ListResult;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtLevelWeightDao;
+import com.reps.khxt.entity.KhxtLevel;
 import com.reps.khxt.entity.KhxtLevelWeight;
+import com.reps.khxt.service.IKhxtLevelService;
 import com.reps.khxt.service.IKhxtLevelWeightService;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 @Service
 @Transactional
@@ -22,6 +29,9 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 	
 	@Autowired
 	KhxtLevelWeightDao dao;
+	
+	@Autowired
+	IKhxtLevelService khxtLevelService;
 	
 	@Override
 	public void save(KhxtLevelWeight khxtLevelWeight) throws RepsException {
@@ -39,7 +49,22 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 			throw new RepsException("参数异常");
 		}
 		KhxtLevelWeight levelWeght = dao.get(khxtLevelWeight.getId());
-		
+		String name = khxtLevelWeight.getName();
+		if(StringUtil.isNotBlank(name)) {
+			levelWeght.setName(name);
+		}
+		Short visible = khxtLevelWeight.getVisible();
+		if(null != visible) {
+			levelWeght.setVisible(visible);
+		}
+		String weight = khxtLevelWeight.getWeight();
+		if(StringUtil.isNotCN(weight)) {
+			levelWeght.setWeight(weight);
+		}
+		Integer year = khxtLevelWeight.getYear();
+		if(null != year) {
+			levelWeght.setYear(year);
+		}
 		dao.update(levelWeght);
 	}
 
@@ -55,9 +80,32 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 		return khxtLevelWeight;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ListResult<KhxtLevelWeight> query(int start, int pagesize, KhxtLevelWeight khxtLevelWeight) {
-		return dao.query(start, pagesize, khxtLevelWeight);
+		ListResult<KhxtLevelWeight> listResult = dao.query(start, pagesize, khxtLevelWeight);
+		for (KhxtLevelWeight levelWeight : listResult.getList()) {
+			String weight = levelWeight.getWeight();
+			if(StringUtil.isNotBlank(weight)) {
+				JSONArray levelWeightArray = JSONArray.fromObject(weight);
+				StringBuilder sb = new StringBuilder();
+				if(null != levelWeightArray && !levelWeightArray.isEmpty()) {
+					for (Iterator<JSONObject> iterator = levelWeightArray.iterator(); iterator.hasNext();) {
+						JSONObject obj = (JSONObject) iterator.next();
+						KhxtLevel khxtLevel = khxtLevelService.get(obj.getString("levelId"));
+						String name = khxtLevel.getName();
+						String we = obj.getString("weight");
+						sb.append(name);
+						sb.append(we);
+						sb.append("%");
+						sb.append(";");
+					}
+					sb.deleteCharAt(sb.toString().lastIndexOf(";"));
+				}
+				levelWeight.setWeightDisplay(sb.toString());
+			}
+		}
+		return listResult;
 	}
 
 }

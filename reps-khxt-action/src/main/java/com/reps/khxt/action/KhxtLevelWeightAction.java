@@ -78,6 +78,9 @@ public class KhxtLevelWeightAction extends BaseAction {
 	public ModelAndView toEdit(String id) {
 		ModelAndView mav = getModelAndView("/khxt/levelweight/edit");
 		KhxtLevelWeight khxtLevelWeight = khxtLevelWeightService.get(id);
+		List<KhxtLevel> levelList = khxtLevelService.findAll();
+		mav.addObject("applyYearMap", APPLY_YEAR_RANGE);
+		mav.addObject("levelList", levelList);
 		mav.addObject("levelWeight", khxtLevelWeight);
 		return mav;
 	}
@@ -104,6 +107,23 @@ public class KhxtLevelWeightAction extends BaseAction {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("删除失败", e);
+			return ajax(AjaxStatus.ERROR, e.getMessage());
+		}
+	}
+	
+	@RequestMapping({ "/show" })
+	public Object show(String id) {
+		try {
+			ModelAndView mav = new ModelAndView("/khxt/levelweight/show");
+			KhxtLevelWeight khxtLevelWeight = khxtLevelWeightService.get(id);
+			List<KhxtLevel> levelList = khxtLevelService.findAll();
+			mav.addObject("applyYearMap", APPLY_YEAR_RANGE);
+			mav.addObject("levelList", levelList);
+			mav.addObject("levelWeight", khxtLevelWeight);
+			return mav;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("获取详情失败", e);
 			return ajax(AjaxStatus.ERROR, e.getMessage());
 		}
 	}

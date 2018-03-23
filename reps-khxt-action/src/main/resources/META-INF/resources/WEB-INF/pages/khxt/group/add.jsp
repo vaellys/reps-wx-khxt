@@ -3,32 +3,32 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>新增指标</title>
+	<title>新增考核分组</title>
 	<reps:theme />
 </head>
 <body>
 <reps:container>
 	<reps:panel id="myform" dock="center" action="add.mvc" formId="xform" validForm="true"  >
-		<reps:formcontent style="margin-left:250px;">
+		<reps:formcontent style="margin-left:100px;">
 			<reps:formfield label="	分组名称" fullRow="true">
 				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:300px"></reps:input>
 			</reps:formfield>
 		
 			<reps:formfield label="考核人级别" fullRow="true">
-				<reps:select dataSource="${khrlevelMap}" id="khrlevelid" name="khxtLevel.id" required="true" style="width:304px"></reps:select>
+				<reps:select dataSource="${LevelMap}" id="khrlevelid" name="khxtLevel.id" required="true" style="width:304px"></reps:select>
 			</reps:formfield>
 			
 			<reps:formfield label="考核人姓名" fullRow="true">
-				<reps:input name="khr" minLength="2" maxLength="20" required="true" style="width:300px"></reps:input>
-				<input type="button" value="选择">
+				<reps:input name="khr" minLength="2" maxLength="20" required="true" style="width:300px;height:100px"></reps:input>
+				<sys:user id="user" hideId="hideId" hideName="hideName" hideNameValue="" nameValue="" url="${ctx }/reps/khxt/group/listlevel.mvc"  multiple="true" name="选择" cssClass="add-a" callBack="userCallBack">新增</sys:user>
 			</reps:formfield>
 			
 			<reps:formfield label="被考核人级别" fullRow="true">
-				<reps:select dataSource="${bkhrlevelMap}" id="bkhrlevelid" name="bkhxtLevel.id" required="true" style="width:304px"></reps:select>
+				<reps:select dataSource="${LevelMap}" id="bkhrlevelid" name="bkhxtLevel.id" required="true" style="width:304px"></reps:select>
 			</reps:formfield>
 			
 			<reps:formfield label="考被核人姓名" fullRow="true">
-				<reps:input name="bkhr" minLength="2" maxLength="20" required="true" style="width:300px"></reps:input>
+				<reps:input name="bkhr" minLength="2" maxLength="20" required="true" style="width:300px;height:100px"></reps:input>
 			</reps:formfield>
 		
 			<reps:formfield label="是否参与考核" fullRow="true">
@@ -45,6 +45,8 @@
 </reps:container>
 </body>
 <script type="text/javascript">
+
+	
 	var my = function(data){
 		messager.message(data, function(){ back(); });
 	};

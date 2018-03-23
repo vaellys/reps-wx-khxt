@@ -25,13 +25,13 @@
 		<reps:grid id="itemList" items="${list}" form="queryForm" var="khxtgroup" pagination="${pager}" flagSeq="true">
 			<reps:gridrow>
 				<reps:gridfield title="分组名称" width="15" align="center">${khxtgroup.name}</reps:gridfield>
-				<reps:gridfield title="考核人" width="30" align="center">${khxtgroup.khxtLevel.name}</reps:gridfield>
-				<reps:gridfield title="被考核人" width="15" align="center">${khxtgroup.bkhxtLevel.name}</reps:gridfield>
+				<reps:gridfield title="考核人" width="20" align="center">${khxtgroup.khxtLevel.name}</reps:gridfield>
+				<reps:gridfield title="被考核人" width="25" align="center">${khxtgroup.bkhxtLevel.name}</reps:gridfield>
 				
-				<reps:gridfield title="本组是否参与" width="15" align="center"><c:if test="${khxtgroup.isEnable == '1'}">参与</c:if><c:if test="${khxtgroup.isEnable == '2'}">不参与</c:if></reps:gridfield>
+				<reps:gridfield title="本组是否参与" width="15" align="center"><c:if test="${khxtgroup.isEnable == '1'}">参与</c:if><c:if test="${khxtgroup.isEnable == '0'}">不参与</c:if></reps:gridfield>
 				<reps:gridfield title="操作" width="25">
 					<reps:button cssClass="detail-table" action="show.mvc?id=${khxtgroup.id }" value="详细"></reps:button>
-					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${item.id}"></reps:button>
+					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${khxtgroup.id}"></reps:button>
 					<reps:ajax cssClass="delete-table" messageCode="manage.action.delete" confirm="您确定要删除所选行吗？"
 						callBack="my" url="delete.mvc?id=${khxtgroup.id}">
 					</reps:ajax>
