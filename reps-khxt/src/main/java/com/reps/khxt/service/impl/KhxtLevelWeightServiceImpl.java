@@ -1,6 +1,7 @@
 package com.reps.khxt.service.impl;
 
 import java.util.Iterator;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -107,13 +108,17 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 		}
 		return listResult;
 	}
-
 	@Override
 	public void copy(String id) throws RepsException {
 		if(StringUtil.isBlank(id)) {
 			throw new RepsException("参数异常:级别权重ID为空");
 		}
 		dao.insert(id);
+	}
+	@Override
+	public List<KhxtLevelWeight> findAll() {
+		
+		return dao.find(null);
 	}
 
 }

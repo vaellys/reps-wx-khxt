@@ -27,45 +27,45 @@ import com.reps.system.service.IUserService;
 
 @Service
 @Transactional
-public class IKhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
-	
-	protected final Logger logger = LoggerFactory.getLogger(IKhxtLevelPersonServiceImpl.class);
-	
+public class KhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
+
+	protected final Logger logger = LoggerFactory.getLogger(KhxtLevelPersonServiceImpl.class);
+
 	@Autowired
 	KhxtLevelPersonDao dao;
-	
+
 	@Autowired
 	IUserService userService;
-	
+
 	@Autowired
 	IPersonService personService;
-	
+
 	@Autowired
 	IAccountService accountService;
-	
+
 	@Override
 	public void save(KhxtLevelPerson khxtLevelPerson) throws RepsException {
 		dao.save(khxtLevelPerson);
 	}
-	
+
 	@Override
 	public void saveAll(KhxtLevelPerson khxtLevelPerson) throws RepsException {
 		String levelId = khxtLevelPerson.getLevelId();
-		if(StringUtil.isBlank(levelId)) {
+		if (StringUtil.isBlank(levelId)) {
 			throw new RepsException("参数异常:级别ID为空");
 		}
 		for (String id : khxtLevelPerson.getPersonIds().split(",")) {
 			KhxtLevelPerson lp = new KhxtLevelPerson();
-			//设置级别ID
+			// 设置级别ID
 			KhxtLevel khxtLevel = new KhxtLevel();
 			khxtLevel.setId(levelId);
-			lp.setKhxtLevel(khxtLevel );
+			lp.setKhxtLevel(khxtLevel);
 			lp.setPersonId(id);
-			//获取相关联person
+			// 获取相关联person
 			Person person = personService.get(id);
 			lp.setPersonName(person.getName());
 			lp.setPersonSex(person.getSex());
-			//设置机构ID
+			// 设置机构ID
 			Organize o = new Organize();
 			Account account = accountService.getByPersonId(id, true);
 			User user = userService.getByAccountId(account.getId()).get(0);
@@ -89,7 +89,7 @@ public class IKhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 	public ListResult<KhxtLevelPerson> query(int start, int pagesize, KhxtLevelPerson khxtLevelPerson) {
 		return dao.query(start, pagesize, khxtLevelPerson);
 	}
-	
+
 	@Override
 	public ListResult<UserVo> choosePerson(int start, int pagesize, User user, String levelId) throws RepsException {
 		return dao.chooseLevelPerson(start, pagesize, user, levelId);
@@ -97,20 +97,20 @@ public class IKhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 
 	@Override
 	public void deleteAll(String ids) throws RepsException {
-		if(StringUtil.isNotBlank(ids)) {
+		if (StringUtil.isNotBlank(ids)) {
 			dao.batchDelete(ids);
 		}
 	}
 
 	@Override
 	public boolean checkLevelPersonExistInLevel(String levelId) throws RepsException {
-		if(StringUtil.isBlank(levelId)) {
+		if (StringUtil.isBlank(levelId)) {
 			throw new RepsException("参数异常:请指定级别ID");
 		}
 		KhxtLevelPerson lp = new KhxtLevelPerson();
 		lp.setLevelId(levelId);
 		List<KhxtLevelPerson> levelPersonList = dao.find(lp);
-		if(null == levelPersonList || levelPersonList.isEmpty()) {
+		if (null == levelPersonList || levelPersonList.isEmpty()) {
 			return false;
 		} else {
 			return true;
@@ -119,14 +119,14 @@ public class IKhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 
 	@Override
 	public String joinLevelPersonName(String levelId) throws RepsException {
-		if(StringUtil.isBlank(levelId)) {
+		if (StringUtil.isBlank(levelId)) {
 			throw new RepsException("参数异常:请指定级别ID");
 		}
 		StringBuilder sb = new StringBuilder();
 		KhxtLevelPerson lp = new KhxtLevelPerson();
 		lp.setLevelId(levelId);
 		List<KhxtLevelPerson> list = dao.find(lp);
-		if(null != list && !list.isEmpty()) {
+		if (null != list && !list.isEmpty()) {
 			for (KhxtLevelPerson khxtLevelPerson : list) {
 				sb.append(khxtLevelPerson.getPersonName());
 				sb.append(",");
@@ -134,6 +134,18 @@ public class IKhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 			sb.deleteCharAt(sb.toString().lastIndexOf(","));
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public List<KhxtLevelPerson> findLevelPerson(KhxtLevelPerson khxtLevelPerson) {
+
+		return dao.find(khxtLevelPerson);
+	}
+
+	@Override
+	public KhxtLevelPerson getByPersonId(String id) {
+
+		return dao.getByPersonId(id);
 	}
 
 }

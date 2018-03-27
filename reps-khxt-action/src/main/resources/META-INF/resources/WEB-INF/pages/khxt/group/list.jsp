@@ -9,14 +9,7 @@
 <body>
 <reps:container layout="true">
 	<reps:panel title="" id="top" dock="top" method="post" action="list.mvc" formId="queryForm">
-		<reps:formcontent parentLayout="true" style="width:80%;">
-			<reps:formfield label="名称" labelStyle="width:20%;" textStyle="width:27%;">
-				<reps:input name="name" maxLength="20">${khxtgroup.name }</reps:input>
-			</reps:formfield>
-		</reps:formcontent>
-		<reps:querybuttons>
-			<reps:ajaxgrid messageCode="manage.button.query" formId="queryForm" gridId="itemList" cssClass="search-form-a"></reps:ajaxgrid>
-		</reps:querybuttons>
+		
 		<reps:footbar>
 			<reps:button cssClass="add-a" action="toadd.mvc" messageCode="manage.action.add" value="新增"></reps:button>
 		</reps:footbar>
@@ -30,7 +23,7 @@
 				
 				<reps:gridfield title="本组是否参与" width="15" align="center"><c:if test="${khxtgroup.isEnable == '1'}">参与</c:if><c:if test="${khxtgroup.isEnable == '0'}">不参与</c:if></reps:gridfield>
 				<reps:gridfield title="操作" width="25">
-					<reps:button cssClass="detail-table" action="show.mvc?id=${khxtgroup.id }" value="详细"></reps:button>
+					
 					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${khxtgroup.id}"></reps:button>
 					<reps:ajax cssClass="delete-table" messageCode="manage.action.delete" confirm="您确定要删除所选行吗？"
 						callBack="my" url="delete.mvc?id=${khxtgroup.id}">

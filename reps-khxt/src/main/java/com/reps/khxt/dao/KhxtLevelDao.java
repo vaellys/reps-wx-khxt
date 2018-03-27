@@ -52,11 +52,18 @@ public class KhxtLevelDao {
 		}
 		return dao.query(dc, start, pagesize, Order.asc("level"));
 	}
-	
+
 	public List<KhxtLevel> find() {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevel.class);
 		dc.addOrder(Order.asc("level"));
 		return dao.findByCriteria(dc);
 	}
-	
+
+	public List<KhxtLevel> findByPower(Short[] a) {
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevel.class);
+
+		dc.add(Restrictions.in("power", a));
+		return dao.findByCriteria(dc);
+	}
+
 }

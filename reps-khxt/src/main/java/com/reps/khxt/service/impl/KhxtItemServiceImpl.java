@@ -19,9 +19,9 @@ import com.reps.khxt.service.IKhxtItemService;
 
 @Service
 @Transactional
-public class IKhxtItemServiceImpl implements IKhxtItemService {
+public class KhxtItemServiceImpl implements IKhxtItemService {
 	
-	protected final Logger logger = LoggerFactory.getLogger(IKhxtItemServiceImpl.class);
+	protected final Logger logger = LoggerFactory.getLogger(KhxtItemServiceImpl.class);
 	
 	@Autowired
 	KhxtItemDao dao;
@@ -115,6 +115,12 @@ public class IKhxtItemServiceImpl implements IKhxtItemService {
 			}
 		} 
 		return false;
+	}
+
+	@Override
+	public List<KhxtItem> findAll() {
+		
+		return dao.find(null);
 	}
 
 }

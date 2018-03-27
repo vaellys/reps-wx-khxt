@@ -19,13 +19,13 @@ import com.reps.khxt.service.IKhxtLevelService;
 
 @Service
 @Transactional
-public class IKhxtLevelServiceImpl implements IKhxtLevelService {
+public class KhxtLevelServiceImpl implements IKhxtLevelService {
 
-	protected final Logger logger = LoggerFactory.getLogger(IKhxtLevelServiceImpl.class);
+	protected final Logger logger = LoggerFactory.getLogger(KhxtLevelServiceImpl.class);
 
 	@Autowired
 	KhxtLevelDao dao;
-	
+
 	@Autowired
 	IKhxtLevelPersonService khxtLevelPersonService;
 
@@ -36,14 +36,14 @@ public class IKhxtLevelServiceImpl implements IKhxtLevelService {
 
 	@Override
 	public void delete(KhxtLevel khxtLevel) throws RepsException {
-		if(null == khxtLevel) {
+		if (null == khxtLevel) {
 			throw new RepsException("参数异常");
 		}
 		String id = khxtLevel.getId();
-		if(StringUtil.isBlank(id)) {
+		if (StringUtil.isBlank(id)) {
 			throw new RepsException("参数异常:级别ID为空");
 		}
-		if(!khxtLevelPersonService.checkLevelPersonExistInLevel(id)) {
+		if (!khxtLevelPersonService.checkLevelPersonExistInLevel(id)) {
 			dao.delete(khxtLevel);
 		} else {
 			throw new RepsException("删除级别中包含级别人员");
@@ -52,20 +52,20 @@ public class IKhxtLevelServiceImpl implements IKhxtLevelService {
 
 	@Override
 	public void update(KhxtLevel khxtLevel) throws RepsException {
-		if(null == khxtLevel) {
+		if (null == khxtLevel) {
 			throw new RepsException("参数异常");
 		}
 		KhxtLevel level = dao.get(khxtLevel.getId());
 		String name = khxtLevel.getName();
-		if(StringUtil.isNotBlank(name)) {
+		if (StringUtil.isNotBlank(name)) {
 			level.setName(name);
 		}
 		Short l = khxtLevel.getLevel();
-		if(null != l) {
+		if (null != l) {
 			level.setLevel(l);
 		}
 		Short power = khxtLevel.getPower();
-		if(null != power) {
+		if (null != power) {
 			level.setPower(power);
 		}
 		dao.update(level);
@@ -73,11 +73,11 @@ public class IKhxtLevelServiceImpl implements IKhxtLevelService {
 
 	@Override
 	public KhxtLevel get(String id) throws RepsException {
-		if(StringUtil.isBlank(id)) {
+		if (StringUtil.isBlank(id)) {
 			throw new RepsException("参数异常:级别ID不能为空");
 		}
 		KhxtLevel khxtLevel = dao.get(id);
-		if(null == khxtLevel) {
+		if (null == khxtLevel) {
 			throw new RepsException("参数异常:级别ID无效");
 		}
 		return dao.get(id);
@@ -86,17 +86,23 @@ public class IKhxtLevelServiceImpl implements IKhxtLevelService {
 	@Override
 	public ListResult<KhxtLevel> query(int start, int pagesize, KhxtLevel khxtLevel) {
 		ListResult<KhxtLevel> listResult = dao.query(start, pagesize, khxtLevel);
-		//设置级别人员名字
+		// 设置级别人员名字
 		setLevelPersonNames(listResult.getList());
 		return listResult;
 	}
-	
+
 	private void setLevelPersonNames(List<KhxtLevel> list) {
-		if(null != list && !list.isEmpty()) {
+		if (null != list && !list.isEmpty()) {
 			for (KhxtLevel level : list) {
 				level.setPersonNames(khxtLevelPersonService.joinLevelPersonName(level.getId()));
 			}
 		}
+	}
+
+	@Override
+	public List<KhxtLevel> listKhxtLevel() {
+
+		return dao.find();
 	}
 
 	@Override
@@ -106,4 +112,11 @@ public class IKhxtLevelServiceImpl implements IKhxtLevelService {
 		return allList;
 	}
 
+	@Override
+	public List<KhxtLevel> findByPower(Short[] b) {
+		if (b == null || b.length == 0) {
+			throw new RepsException("权限级别不能为空");
+		}
+		return dao.findByPower(b);
+	}
 }

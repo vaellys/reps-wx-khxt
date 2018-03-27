@@ -64,4 +64,18 @@ public interface IKhxtLevelService {
 	 */
 	public List<KhxtLevel> findAll() throws RepsException;
 
+	List<KhxtLevel> listKhxtLevel();
+
+	/**
+	 * 根据权限查询
+	 * 
+	 * @author Alex
+	 * @date 2018年3月24日
+	 * @param a
+	 * @return
+	 * @return List<KhxtLevel>
+	 */
+
+	public List<KhxtLevel> findByPower(Short[] b);
+
 }

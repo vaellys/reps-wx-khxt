@@ -10,6 +10,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import com.reps.core.orm.IGenericDao;
 import com.reps.core.orm.IJdbcDao;
@@ -109,30 +110,58 @@ public class KhxtLevelPersonDao {
 			sbLp.append("')");
 		}
 		sbLp.append(" and u.identity in ('10', '20')");
-		Long uniqueResult = (Long) dao.getSession().createQuery("select count(distinct p.id)" + sbLp.toString()).uniqueResult();
+		Long uniqueResult = (Long) dao.getSession().createQuery("select count(distinct p.id)" + sbLp.toString())
+				.uniqueResult();
 		sbLp.append(" order by o.parentXpath asc");
-		List<UserVo> list = dao.getSession().createQuery(selectSb.toString() + sbLp.toString()).setFirstResult(start).setMaxResults(pagesize).list();
+		List<UserVo> list = dao.getSession().createQuery(selectSb.toString() + sbLp.toString()).setFirstResult(start)
+				.setMaxResults(pagesize).list();
 		ListResult<UserVo> result = new ListResult<>();
 		result.setList(list);
 		result.setCount(uniqueResult);
 		return result;
 	}
-	
+
 	public void batchDelete(String ids) {
 		StringBuilder sb = new StringBuilder("delete " + KhxtLevelPerson.class.getName() + " bean");
 		sb.append(" where bean.id in (" + formatSql(ids) + ")");
 		this.dao.execute(sb.toString());
 	}
-	
+
 	public List<KhxtLevelPerson> find(KhxtLevelPerson khxtLevelPerson) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevelPerson.class);
+		dc.createAlias("organize", "o");
 		if (null != khxtLevelPerson) {
 			String levelId = khxtLevelPerson.getLevelId();
-			if(StringUtil.isNotBlank(levelId)) {
+			if (StringUtil.isNotBlank(levelId)) {
 				dc.add(Restrictions.eq("levelId", levelId));
 			}
+			String personName = khxtLevelPerson.getPersonName();
+			if (StringUtil.isNotBlank(personName)) {
+				dc.add(Restrictions.eq("personName", personName));
+			}
+			if (null != khxtLevelPerson.getOrganize()) {
+				Organize organiz = khxtLevelPerson.getOrganize();
+				String name = organiz.getName();
+				if (StringUtil.isNotBlank(name)) {
+					dc.add(Restrictions.eq("o.name", name));
+				}
+
+			}
 		}
+
 		return dao.findByCriteria(dc);
 	}
 
+	public KhxtLevelPerson getByPersonId(String id) {
+
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevelPerson.class, "p");
+
+		dc.add(Restrictions.eq("p.personId", id));
+		List<KhxtLevelPerson> list = dao.findByCriteria(dc);
+		if (CollectionUtils.isEmpty(list)) {
+			return null;
+		}
+		return list.get(0);
+
+	}
 }

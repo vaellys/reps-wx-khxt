@@ -1,5 +1,7 @@
 package com.reps.khxt.service;
 
+import java.util.List;
+
 import com.reps.core.exception.RepsException;
 import com.reps.core.orm.ListResult;
 import com.reps.khxt.entity.KhxtItem;
@@ -12,7 +14,7 @@ import com.reps.khxt.entity.KhxtItem;
  * @date 2018年3月14日 上午9:34:41
  */
 public interface IKhxtItemService {
-	
+
 	/**
 	 * 添加指标
 	 * @param khxtItem
@@ -26,14 +28,14 @@ public interface IKhxtItemService {
 	 * @throws RepsException
 	 */
 	public void delete(KhxtItem khxtItem) throws RepsException;
-	
+
 	/**
 	 * 修改指标
 	 * @param khxtItem
 	 * @throws RepsException
 	 */
 	public void update(KhxtItem khxtItem) throws RepsException;
-	
+
 	/**
 	 * 查询指标
 	 * @param id
@@ -41,7 +43,7 @@ public interface IKhxtItemService {
 	 * @throws RepsException
 	 */
 	public KhxtItem get(String id) throws RepsException;
-	
+
 	/**
 	 * 查询指标带分页参数
 	 * @param start
@@ -50,7 +52,7 @@ public interface IKhxtItemService {
 	 * @return ListResult<KhxtItem>
 	 */
 	public ListResult<KhxtItem> query(int start, int pagesize, KhxtItem khxtItem) throws RepsException;
-	
+
 	/**
 	 * 查询指标列表
 	 * @param cid
@@ -66,5 +68,15 @@ public interface IKhxtItemService {
 	 * @throws RepsException
 	 */
 	public boolean checkItemNameExists(KhxtItem khxtItem) throws RepsException;
+
+	/**
+	 * 查询所有指标
+	 * 
+	 * @author Alex
+	 * @date 2018年3月25日
+	 * @return
+	 * @return List<KhxtItem>
+	 */
+	public List<KhxtItem> findAll();
 
 }

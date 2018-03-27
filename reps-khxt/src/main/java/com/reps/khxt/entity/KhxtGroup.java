@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reps.core.orm.IdEntity;
@@ -31,28 +32,28 @@ public class KhxtGroup extends IdEntity implements Serializable {
 	private String name;
 
 	/** 考核人级别ID */
-	@Column(name = "khr_level_id", length = 32)
+	@Column(name = "khr_level_id", length = 32, nullable = false, insertable = false, updatable = false)
 	private String khrId;
 
 	/** 考核人级别 */
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "level_id", insertable = false, updatable = false)
-	private KhxtLevel KhxtLevel;
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "khr_level_id")
+	private KhxtLevel khxtLevel;
 
 	/** 考核人json */
 	@Column(name = "khr", length = 500)
 	private String khr;
 
 	/** 被考核人级别ID */
-	@Column(name = "bkhr_level_id", length = 32)
+	@Column(name = "bkhr_level_id", length = 32, nullable = false, insertable = false, updatable = false)
 	private String bkhrId;
 
 	/** 被考核人级别 */
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "level_id", insertable = false, updatable = false)
-	private KhxtLevel bKhxtLevel;
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "bkhr_level_id")
+	private KhxtLevel bkhxtLevel;
 
 	/** 被考核人json */
 	@Column(name = "bkhr")
@@ -62,9 +63,17 @@ public class KhxtGroup extends IdEntity implements Serializable {
 	@Column(name = "remark")
 	private String remark;
 
-	/** 是否参与考核 1：参与    2：不参与 */
+	/** 是否参与考核 1：参与 2：不参与 */
 	@Column(name = "is_enable", length = 200)
 	private Short isEnable;
+
+	@Transient
+	@JsonIgnore
+	private String khrIds;
+
+	@Transient
+	@JsonIgnore
+	private String bkhrIds;
 
 	public String getName() {
 		return name;
@@ -83,11 +92,19 @@ public class KhxtGroup extends IdEntity implements Serializable {
 	}
 
 	public KhxtLevel getKhxtLevel() {
-		return KhxtLevel;
+		return khxtLevel;
 	}
 
 	public void setKhxtLevel(KhxtLevel khxtLevel) {
-		KhxtLevel = khxtLevel;
+		this.khxtLevel = khxtLevel;
+	}
+
+	public KhxtLevel getBkhxtLevel() {
+		return bkhxtLevel;
+	}
+
+	public void setBkhxtLevel(KhxtLevel bkhxtLevel) {
+		this.bkhxtLevel = bkhxtLevel;
 	}
 
 	public String getKhr() {
@@ -104,14 +121,6 @@ public class KhxtGroup extends IdEntity implements Serializable {
 
 	public void setBkhrId(String bkhrId) {
 		this.bkhrId = bkhrId;
-	}
-
-	public KhxtLevel getbKhxtLevel() {
-		return bKhxtLevel;
-	}
-
-	public void setbKhxtLevel(KhxtLevel bKhxtLevel) {
-		this.bKhxtLevel = bKhxtLevel;
 	}
 
 	public String getBkhr() {
@@ -138,8 +147,20 @@ public class KhxtGroup extends IdEntity implements Serializable {
 		this.isEnable = isEnable;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public String getKhrIds() {
+		return khrIds;
+	}
+
+	public void setKhrIds(String khrIds) {
+		this.khrIds = khrIds;
+	}
+
+	public String getBkhrIds() {
+		return bkhrIds;
+	}
+
+	public void setBkhrIds(String bkhrIds) {
+		this.bkhrIds = bkhrIds;
 	}
 
 }
