@@ -125,7 +125,7 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 	@Override
 	public KhxtAppraiseSheet get(String id, boolean eager) throws RepsException {
 		if(StringUtil.isBlank(id)) {
-			throw new RepsException("参数异常:ID不能为空");
+			throw new RepsException("参数异常:考核ID为空");
 		}
 		KhxtAppraiseSheet khxtAppraiseSheet = dao.get(id);
 		if(null == khxtAppraiseSheet) {

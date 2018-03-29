@@ -145,10 +145,12 @@ public class KhxtLevelPersonDao {
 				if (StringUtil.isNotBlank(name)) {
 					dc.add(Restrictions.eq("o.name", name));
 				}
-
+			}
+			String personId = khxtLevelPerson.getPersonId();
+			if(StringUtil.isNotBlank(personId)) {
+				dc.add(Restrictions.eq("personId", personId));
 			}
 		}
-
 		return dao.findByCriteria(dc);
 	}
 

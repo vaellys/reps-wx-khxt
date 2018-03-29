@@ -122,11 +122,11 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	@Override
 	public KhxtPerformanceMembers get(String id) throws RepsException {
 		if(StringUtil.isBlank(id)) {
-			throw new RepsException("ID为空");
+			throw new RepsException("人员名单ID为空");
 		}
 		KhxtPerformanceMembers khxtPerformanceMembers = dao.get(id);
 		if(null == khxtPerformanceMembers) {
-			throw new RepsException("参数异常:ID无效");
+			throw new RepsException("参数异常:人员名单ID无效");
 		}
 		return khxtPerformanceMembers;
 	}

@@ -18,11 +18,13 @@ import com.reps.core.util.StringUtil;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
 import com.reps.khxt.entity.KhxtAppraiseSheet;
+import com.reps.khxt.entity.KhxtLevelPerson;
 import com.reps.khxt.entity.KhxtPerformanceMembers;
+import com.reps.khxt.entity.KhxtPerformanceWork;
 import com.reps.khxt.service.IKhxtAppraiseSheetService;
+import com.reps.khxt.service.IKhxtLevelPersonService;
 import com.reps.khxt.service.IKhxtPerformanceMembersService;
-
-import net.sf.json.JSONObject;
+import com.reps.khxt.service.IKhxtPerformanceWorkService;
 
 @Controller
 @RequestMapping(value = RepsConstant.ACTION_BASE_PATH + "/khxt/member")
@@ -35,6 +37,12 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 	
 	@Autowired
 	IKhxtAppraiseSheetService khxtAppraiseSheetService;
+	
+	@Autowired
+	IKhxtPerformanceWorkService khxtPerformanceWorkService;
+	
+	@Autowired
+	IKhxtLevelPersonService khxtLevelPersonService;
 	
 	@RequestMapping(value = "/appraisepoint")
 	public Object list(Pagination pager, KhxtPerformanceMembers khxtPerformanceMembers) {
@@ -74,6 +82,23 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("添加失败", e);
+			return ajax(AjaxStatus.ERROR, e.getMessage());
+		}
+	}
+	
+	@RequestMapping({ "/workdetail" })
+	public Object workdetail(KhxtPerformanceWork performanceWork) {
+		try {
+			ModelAndView mav = new ModelAndView("/khxt/member/workdetail");
+			List<KhxtPerformanceWork> list = khxtPerformanceWorkService.find(performanceWork);
+			KhxtLevelPerson person = khxtLevelPersonService.getByPersonId(performanceWork.getPersonId());
+			mav.addObject("workList", list);
+			mav.addObject("performanceWork", performanceWork);
+			mav.addObject("levelPerson", person);
+			return mav;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("查询失败", e);
 			return ajax(AjaxStatus.ERROR, e.getMessage());
 		}
 	}
