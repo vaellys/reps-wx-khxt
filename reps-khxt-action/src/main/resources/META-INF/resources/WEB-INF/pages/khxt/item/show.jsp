@@ -17,7 +17,7 @@
 				<reps:detailfield label="所属类别" fullRow="true"
 					labelStyle="width:20%;">${item.khxtCategory.name }</reps:detailfield>
 				<reps:detailfield label="所需积分" fullRow="true"
-					labelStyle="width:20%;">${item.point }</reps:detailfield>
+					labelStyle="width:20%;"><fmt:formatNumber value="${item.point}" pattern="#.#"/></reps:detailfield>
 			</reps:detail>
 			<reps:formbar>
 				<reps:button cssClass="btn_back" type="button" onClick="back()"

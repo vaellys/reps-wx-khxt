@@ -14,6 +14,7 @@ import com.reps.core.orm.ListResult;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtLevelDao;
 import com.reps.khxt.entity.KhxtLevel;
+import com.reps.khxt.service.IKhxtGroupService;
 import com.reps.khxt.service.IKhxtLevelPersonService;
 import com.reps.khxt.service.IKhxtLevelService;
 
@@ -28,6 +29,9 @@ public class KhxtLevelServiceImpl implements IKhxtLevelService {
 
 	@Autowired
 	IKhxtLevelPersonService khxtLevelPersonService;
+	
+	@Autowired
+	IKhxtGroupService KhxtGroupService;
 
 	@Override
 	public void save(KhxtLevel khxtLevel) throws RepsException {
@@ -43,11 +47,12 @@ public class KhxtLevelServiceImpl implements IKhxtLevelService {
 		if (StringUtil.isBlank(id)) {
 			throw new RepsException("参数异常:级别ID为空");
 		}
-		if (!khxtLevelPersonService.checkLevelPersonExistInLevel(id)) {
+		if (!khxtLevelPersonService.checkLevelPersonExistInLevel(id) && !KhxtGroupService.checkLevelExist(id)) {
 			dao.delete(khxtLevel);
 		} else {
-			throw new RepsException("删除级别中包含级别人员");
+			throw new RepsException("删除级别中包含人员或者被组引用");
 		}
+		
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public interface IKhxtItemService {
 	 * @return khxtItem
 	 * @throws RepsException
 	 */
-	public KhxtItem get(String id) throws RepsException;
+	public KhxtItem get(String id, boolean eager) throws RepsException;
 
 	/**
 	 * 查询指标带分页参数

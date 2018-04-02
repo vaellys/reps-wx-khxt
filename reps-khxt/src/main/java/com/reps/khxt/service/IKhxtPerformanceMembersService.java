@@ -10,17 +10,19 @@ public interface IKhxtPerformanceMembersService {
 	/**
 	 * 解析人员名单信息JSON
 	 * @param memberJson
+	 * @param itemPointJson
+	 * @param khxtPerformanceMembers
 	 * @throws RepsException
 	 */
-	public void updateAndParseJson(String memberJson, String itemPointJson) throws RepsException;
-	
+	public void updateAndParseJson(String memberJson, String itemPointJson, KhxtPerformanceMembers khxtPerformanceMembers) throws RepsException;
+
 	/**
 	 * 修改人员名单信息
 	 * @param khxtPerformanceMembers
 	 * @throws RepsException
 	 */
 	public void update(KhxtPerformanceMembers khxtPerformanceMembers) throws RepsException;
-	
+
 	/**
 	 * 获取考核人员名单信息
 	 * 
@@ -28,7 +30,7 @@ public interface IKhxtPerformanceMembersService {
 	 * @return List<KhxtPerformanceMembers>
 	 * @throws RepsException
 	 */
-	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers khxtPerformanceMembers) throws RepsException;
+	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers khxtPerformanceMembers, boolean eager) throws RepsException;
 
 	/**
 	 * 查询人员名单信息
@@ -37,5 +39,24 @@ public interface IKhxtPerformanceMembersService {
 	 * @throws RepsException
 	 */
 	public KhxtPerformanceMembers get(String id) throws RepsException;
+
+	/**
+	 * 查询被考核人人员信息
+	 * 
+	 * @author Alex
+	 * @date 2018年3月28日
+	 * @param members
+	 * @return
+	 * @return List<KhxtPerformanceMembers>
+	 */
+	public List<KhxtPerformanceMembers> findByBkhrPersonId(KhxtPerformanceMembers members);
+
+	/**
+	 * 检查考核人打分是否都完成
+	 * @param khxtPerformanceMembers
+	 * @return boolean
+	 * @throws RepsException
+	 */
+	public boolean checkAppraiseFinished(KhxtPerformanceMembers khxtPerformanceMembers) throws RepsException;
 	
 }

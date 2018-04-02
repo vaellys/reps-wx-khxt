@@ -40,6 +40,7 @@ public class KhxtLevelWeightAction extends BaseAction {
 		ListResult<KhxtLevelWeight> listResult = khxtLevelWeightService.query(pager.getStartRow(), pager.getPageSize(), khxtLevelWeight);
 		// 分页数据
 		mav.addObject("list", listResult.getList());
+		mav.addObject("levelWeight", khxtLevelWeight);
 		// 分页参数
 		pager.setTotalRecord(listResult.getCount().longValue());
 		mav.addObject("pager", pager);

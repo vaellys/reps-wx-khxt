@@ -39,7 +39,7 @@
 				
 				<sys:user id="buser" hideId="bhideId" hideName="bhideName"
 					hideNameValue="" nameValue=""
-					url="bkhrlistlevel.mvc" multiple="true" name="人员选择"
+					url="bkhrlistlevel.mvc?levelId=" name="人员选择"
 					cssClass="add-a" callBack="buserCallBack">新增</sys:user>
 				
 			</reps:formfield>
@@ -58,6 +58,14 @@
 </reps:container>
 </body>
 <script type="text/javascript">
+		$(function(){
+			$("#khrlevelid").click(function(){
+				var a =$("#khrlevelid").val();
+				$('#hideId').val(a);
+				
+			})
+		});
+	
 	function levelId(){
 		 var b = $("#khrlevelid").val();
 		return b; 

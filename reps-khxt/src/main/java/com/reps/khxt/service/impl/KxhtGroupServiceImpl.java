@@ -2,14 +2,20 @@ package com.reps.khxt.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.transaction.Transactional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reps.core.exception.RepsException;
 import com.reps.core.orm.ListResult;
+import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtLevelPersonDao;
 import com.reps.khxt.dao.KxhtGroupDao;
 import com.reps.khxt.entity.KhxtGroup;
@@ -17,6 +23,7 @@ import com.reps.khxt.entity.KhxtLevelPerson;
 import com.reps.khxt.service.IKhxtGroupService;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 @Service
 @Transactional
@@ -141,7 +148,48 @@ public class KxhtGroupServiceImpl implements IKhxtGroupService {
 	@Override
 	public List<KhxtGroup> getByLvelId(String khrid) {
 		
-		return dao.getByLvelId(khrid);
+		return dao.getByLvelId(khrid,null);
 	}
-
+	
+	@Override
+	public boolean checkLevelExist(String levelId) throws RepsException {
+		if(StringUtil.isBlank(levelId)) {
+			throw new RepsException("参数异常:级别ID为空");
+		}
+		return 0 < dao.countLevelIds(levelId) ? true : false;
+	}
+	
+	@Override
+	public boolean checkPersonIdExist(String personId) throws RepsException {
+		if(StringUtil.isBlank(personId)) {
+			throw new RepsException("参数异常:人员ID为空");
+		}
+		List<KhxtGroup> groupList = dao.find(null);
+		if(null != groupList && !groupList.isEmpty()) {
+			for (KhxtGroup group : groupList) {
+				if(checkPersonId(group.getKhr(), personId) || checkPersonId(group.getBkhr(), personId)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean checkPersonId(String source, String personId) throws RepsException {
+		if(StringUtil.isNotBlank(source)) {
+			JSONArray sourceArray = JSONArray.fromObject(source);
+			if(null != sourceArray && !sourceArray.isEmpty()) {
+				for (Iterator<JSONObject> iterator = sourceArray.iterator(); iterator.hasNext();) {
+					JSONObject sourceObj = iterator.next();
+					String sourcePersonId = sourceObj.getString("person_id");
+					if(personId.equals(sourcePersonId)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
 }

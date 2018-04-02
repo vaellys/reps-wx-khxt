@@ -1,6 +1,7 @@
 package com.reps.khxt.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -63,7 +64,7 @@ public class KhxtAppraiseSheetFile extends IdEntity implements Serializable {
 	 * 上传时间
 	 */
 	@Column(name = "upload_time")
-	private Long uploadTime;
+	private Date uploadTime;
 
 	public String getPerformanceId() {
 		return performanceId;
@@ -113,11 +114,11 @@ public class KhxtAppraiseSheetFile extends IdEntity implements Serializable {
 		this.fileSize = fileSize;
 	}
 
-	public Long getUploadTime() {
+	public Date getUploadTime() {
 		return uploadTime;
 	}
 
-	public void setUploadTime(Long uploadTime) {
+	public void setUploadTime(Date uploadTime) {
 		this.uploadTime = uploadTime;
 	}
 

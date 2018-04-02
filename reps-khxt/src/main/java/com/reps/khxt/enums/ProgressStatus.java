@@ -2,20 +2,20 @@ package com.reps.khxt.enums;
 
 /**
  * 
- * @ClassName: AppraiseStatus
- * @Description: 上报情况
+ * @ClassName: ProgressStatus
+ * @Description: 进度情况
  * @author qianguobing
- * @date 2018年3月29日 下午12:13:16
+ * @date 2018年3月29日 下午12:14:08
  */
-public enum AppraiseStatus {
+public enum ProgressStatus {
 	
-	UN_REPORTED((short)0, "未上报"), REPORTED((short) 1, "已上报"), APPRAISED((short)2, "已打分");
+	UN_FINISHED((short)0, "未完成"), FINISHED((short) 1, "已完成"), HAS_OVER((short)2, "已结束");
 	
 	private Short id;
 	
 	private String status;
 	
-	AppraiseStatus(Short id, String status) {
+	ProgressStatus(Short id, String status) {
 		this.id = id;
 		this.status = status;
 	}

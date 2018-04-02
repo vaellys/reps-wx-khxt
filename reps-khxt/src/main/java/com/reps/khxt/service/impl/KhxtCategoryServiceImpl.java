@@ -96,9 +96,7 @@ public class KhxtCategoryServiceImpl implements IKhxtCategoryService {
 		String name = khxtCategory.getName();
 		if(StringUtil.isNotBlank(name)) {
 			List<KhxtCategory> list = dao.find(khxtCategory);
-			if(null == list || list.isEmpty()) {
-				return false;
-			}else {
+			if(null != list && !list.isEmpty()) {
 				return true;
 			}
 		} 

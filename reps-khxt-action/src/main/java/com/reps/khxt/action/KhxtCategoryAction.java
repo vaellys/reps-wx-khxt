@@ -38,6 +38,7 @@ public class KhxtCategoryAction extends BaseAction {
 		ListResult<KhxtCategory> listResult = khxtCategoryService.query(pager.getStartRow(), pager.getPageSize(), khxtCategory);
 		// 分页数据
 		mav.addObject("list", listResult.getList());
+		mav.addObject("category", khxtCategory);
 		// 分页参数
 		pager.setTotalRecord(listResult.getCount().longValue());
 		mav.addObject("pager", pager);

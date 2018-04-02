@@ -16,6 +16,7 @@ import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtLevelWeightDao;
 import com.reps.khxt.entity.KhxtLevel;
 import com.reps.khxt.entity.KhxtLevelWeight;
+import com.reps.khxt.service.IKhxtAppraiseSheetService;
 import com.reps.khxt.service.IKhxtLevelService;
 import com.reps.khxt.service.IKhxtLevelWeightService;
 
@@ -34,6 +35,9 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 	@Autowired
 	IKhxtLevelService khxtLevelService;
 	
+	@Autowired
+	IKhxtAppraiseSheetService khxtAppraiseSheetService;
+	
 	@Override
 	public void save(KhxtLevelWeight khxtLevelWeight) throws RepsException {
 		dao.save(khxtLevelWeight);
@@ -41,7 +45,18 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 
 	@Override
 	public void delete(KhxtLevelWeight khxtLevelWeight) throws RepsException {
-		dao.delete(khxtLevelWeight);
+		if(null == khxtLevelWeight) {
+			throw new RepsException("参数异常");
+		}
+		String id = khxtLevelWeight.getId();
+		if(StringUtil.isBlank(id)) {
+			throw new RepsException("参数异常:级别权重ID为空");
+		}
+		if(!khxtAppraiseSheetService.checkWeightExistInSheet(id)) {
+			dao.delete(khxtLevelWeight);
+		} else {
+			throw new RepsException("该权重被引用");
+		}
 	}
 
 	@Override
@@ -108,6 +123,7 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 		}
 		return listResult;
 	}
+	
 	@Override
 	public void copy(String id) throws RepsException {
 		if(StringUtil.isBlank(id)) {
@@ -115,6 +131,7 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 		}
 		dao.insert(id);
 	}
+	
 	@Override
 	public List<KhxtLevelWeight> findAll() {
 		

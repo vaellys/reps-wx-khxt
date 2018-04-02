@@ -2,11 +2,14 @@ package com.reps.khxt.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -65,6 +68,11 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 	/** 评定状态 */
 	@Column(name = "status")
 	private Short status;
+	
+	@JsonIgnore
+	@OneToMany(cascade = {}, fetch=FetchType.LAZY)
+	@JoinColumn(name = "member_id")
+	private List<KhxtPerformancePoint> performancePoints;
 
 	public String getSheetId() {
 		return sheetId;
@@ -137,6 +145,15 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 	public void setKhrPerson(Person khrPerson) {
 		this.khrPerson = khrPerson;
 	}
+
+	public List<KhxtPerformancePoint> getPerformancePoints() {
+		return performancePoints;
+	}
+
+	public void setPerformancePoints(List<KhxtPerformancePoint> performancePoints) {
+		this.performancePoints = performancePoints;
+	}
+	
 	
 }
 	

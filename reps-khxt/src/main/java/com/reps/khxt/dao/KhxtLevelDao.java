@@ -8,6 +8,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import com.reps.core.orm.IGenericDao;
 import com.reps.core.orm.ListResult;
@@ -64,6 +65,22 @@ public class KhxtLevelDao {
 
 		dc.add(Restrictions.in("power", a));
 		return dao.findByCriteria(dc);
+	}
+
+	public KhxtLevel find(KhxtLevel khxtLevel) {
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevel.class);
+
+		if (null != khxtLevel) {
+			Short level = khxtLevel.getLevel();
+			if (level != null) {
+				dc.add(Restrictions.eq("level", level));
+			}
+		}
+		List<KhxtLevel> list = dao.findByCriteria(dc);
+		if (CollectionUtils.isEmpty(list)) {
+			return null;
+		}
+		return list.get(0);
 	}
 
 }

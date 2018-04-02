@@ -14,7 +14,6 @@ import com.reps.core.LoginToken;
 import com.reps.core.RepsConstant;
 import com.reps.core.commons.Pagination;
 import com.reps.core.exception.RepsException;
-import com.reps.core.util.StringUtil;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
 import com.reps.khxt.entity.KhxtAppraiseSheet;
@@ -52,19 +51,15 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 			if(null == currentToken) {
 				throw new RepsException("您还没有登陆！");
 			}
-			//String personId = currentToken.getPersonId();
-			String personId = "4028daac5acc24f8015acfaaf3d70021";
-			if(StringUtil.isBlank(personId)) {
-				throw new RepsException("该登陆人不是考核人！");
-			}
 			KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(khxtPerformanceMembers.getSheetId(), true);
 			mav.addObject("items", khxtAppraiseSheet.getItem());
 			//设置考核人ID
-			khxtPerformanceMembers.setKhrPersonId(personId);
-			
-			List<KhxtPerformanceMembers> results = khxtPerformanceMembersService.find(khxtPerformanceMembers);
+			khxtPerformanceMembers.setKhrPersonId(currentToken.getPersonId());
+			List<KhxtPerformanceMembers> results = khxtPerformanceMembersService.find(khxtPerformanceMembers, true);
 			mav.addObject("performanceMembers", results);
 			mav.addObject("khrPersonName", currentToken.getName());
+			mav.addObject("member", khxtPerformanceMembers);
+			mav.addObject("khxtAppraiseSheet", khxtAppraiseSheet);
 			return mav;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -75,13 +70,13 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 	
 	@RequestMapping(value = "/add")
 	@ResponseBody
-	public Object add(String memberJson, String itemPointJson) {
+	public Object add(String memberJson, String itemPointJson, KhxtPerformanceMembers khxtPerformanceMembers) {
 		try {
-			khxtPerformanceMembersService.updateAndParseJson(memberJson, itemPointJson);
-			return ajax(AjaxStatus.OK, "添加成功");
+			khxtPerformanceMembersService.updateAndParseJson(memberJson, itemPointJson, khxtPerformanceMembers);
+			return ajax(AjaxStatus.OK, "打分成功");
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error("添加失败", e);
+			logger.error("打分失败", e);
 			return ajax(AjaxStatus.ERROR, e.getMessage());
 		}
 	}

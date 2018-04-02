@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,12 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 		if(null == khxtItem) {
 			throw new RepsException("参数异常");
 		}
-		String id = khxtItem.getId();
-		if(StringUtil.isBlank(id)) {
-			throw new RepsException("参数异常:ID为空");
+		KhxtItem item = this.get(khxtItem.getId(), true);
+		if(null != item.getSheets() && !item.getSheets().isEmpty()) {
+			throw new RepsException("该指标被引用");
+		} else {
+			dao.delete(item);
 		}
-		dao.delete(khxtItem);
 	}
 
 	@Override
@@ -72,7 +74,7 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 	}
 
 	@Override
-	public KhxtItem get(String id) throws RepsException {
+	public KhxtItem get(String id, boolean eager) throws RepsException {
 		if(StringUtil.isBlank(id)) {
 			throw new RepsException("参数异常:类别ID不能为空");
 		}
@@ -80,7 +82,10 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 		if(null == khxtItem) {
 			throw new RepsException("参数异常:类别ID无效");
 		}
-		return dao.get(id);
+		if(eager) {
+			Hibernate.initialize(khxtItem.getSheets());
+		}
+		return khxtItem;
 	}
 
 	@Override
@@ -108,9 +113,7 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 		String name = khxtItem.getName();
 		if(StringUtil.isNotBlank(name)) {
 			List<KhxtItem> list = dao.find(khxtItem);
-			if(null == list || list.isEmpty()) {
-				return false;
-			}else {
+			if(null != list && !list.isEmpty()) {
 				return true;
 			}
 		} 

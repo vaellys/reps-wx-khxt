@@ -1,10 +1,13 @@
 package com.reps.khxt.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -41,6 +44,10 @@ public class KhxtItem extends IdEntity implements Serializable {
 	/** 分数 */
 	@Column(name = "point")
 	private Double point;
+	
+	@JsonIgnore
+	@ManyToMany(mappedBy="item", fetch = FetchType.LAZY)
+	private List<KhxtAppraiseSheet> sheets;
 
 	public String getName() {
 		return name;
@@ -72,6 +79,14 @@ public class KhxtItem extends IdEntity implements Serializable {
 
 	public void setCategoryId(String categoryId) {
 		this.categoryId = categoryId;
+	}
+
+	public List<KhxtAppraiseSheet> getSheets() {
+		return sheets;
+	}
+
+	public void setSheets(List<KhxtAppraiseSheet> sheets) {
+		this.sheets = sheets;
 	}
 	
 }

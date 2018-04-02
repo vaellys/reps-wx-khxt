@@ -26,7 +26,7 @@
 			<reps:gridrow>
 				<reps:gridfield title="类别名称" width="15" align="center">${category.name}</reps:gridfield>
 				<reps:gridfield title="备注" width="40">${category.remark}</reps:gridfield>
-				<reps:gridfield title="操作" width="25">
+				<reps:gridfield title="操作" width="15">
 					<reps:button cssClass="modify-table" messageCode="manage.action.update" action="toedit.mvc?id=${category.id}"></reps:button>
 					<reps:ajax cssClass="delete-table" messageCode="manage.action.delete" confirm="您确定要删除所选行吗？"
 						callBack="my" url="delete.mvc?id=${category.id}">

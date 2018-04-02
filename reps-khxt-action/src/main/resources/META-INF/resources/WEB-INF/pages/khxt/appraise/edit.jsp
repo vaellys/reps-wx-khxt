@@ -4,41 +4,44 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>添加月考核</title>
+	<title>修改月考核</title>
 	<reps:theme />
 </head>
 <body>
 <reps:container>
-	<reps:panel id="myform" dock="center" action="add.mvc" formId="xform"  >
+	<reps:panel id="myform" dock="center" action="edit.mvc" formId="xform"  >
 		<reps:formcontent style="margin-left:100px;" columns="2">
 			<reps:formfield label="名称">
-				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:220px"></reps:input>
+				<input name="sheetId" type="hidden" value="${sheet.id}">
+				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:220px">${sheet.name }</reps:input>
 			</reps:formfield>
 		
 			<reps:formfield label="考核年月" >
-				<reps:select dataSource="${season}" id="phase" name="season" required="true" style="width:220px">${current}</reps:select>
+				<reps:select dataSource="${season}" id="phase" name="season" required="true" style="width:220px">${sheet.season}</reps:select>
 			</reps:formfield>
+			
 			<reps:formfield label="填报开始时间" >
-				<reps:datepicker name="beginDate" format="yyyy-MM-dd" />
+				<reps:datepicker name="beginDate" format="yyyy-MM-dd" value="${sheet.beginDate }" />
 			</reps:formfield>
+			
 			<reps:formfield label="填报截止时间" >
-				<reps:datepicker name="endEate" format="yyyy-MM-dd" />
+				<reps:datepicker name="endEate" format="yyyy-MM-dd" value="${sheet.endEate }"/>
 			</reps:formfield>
 			
 			<reps:formfield label="考核人" >
-			 <c:forEach  var="khr"   items="${khr}">
-			 	<c:if test="${!empty khr}">  
-					<input type="checkbox" name="khrids" value="${khr.id}" id="khrids"/>${khr.name}</input>
-             	</c:if>
-             </c:forEach>
+				 <c:forEach  var="khr"   items="${khr}">
+				 	<c:if test="${!empty khr}"> 
+						<input type="checkbox" name="khrids" value="${khr.id}" id="${khr.id}"/>${khr.name}</input>
+	             	</c:if>
+	             </c:forEach>
 			</reps:formfield>
 			
 			<reps:formfield label="考核对象" >
-				<reps:select dataSource="${bkhrMap}" id="bkhr" name="bkhr.id" required="true" style="width:220px"></reps:select>
+				<reps:select dataSource="${bkhrMap}" id="bkhr" name="bkhr.id" required="true" style="width:220px">${sheet.bkhr.id }</reps:select>
 			</reps:formfield>
 			
 			<reps:formfield label="考核权重">
-				<reps:select dataSource="${weightMap}" id="weight.id" name="levelWeight.id" required="true" style="width:220px"></reps:select>
+				<reps:select dataSource="${weightMap}" id="weight.id" name="levelWeight.id" required="true" style="width:220px">${sheet.levelWeight.id }</reps:select>
 			</reps:formfield>
 			<reps:formfield label="备注">
 				<reps:input name="phase" minLength="2" maxLength="20" style="width:220px"></reps:input>
@@ -54,13 +57,20 @@
 				</select>
 			</reps:formfield>
 			<reps:formfield label="已选指标">
-				<select multiple="multiple" name="itemIds" id="itemIds" style="width: 220px;height: 150px;" ></select>
+				<select multiple="multiple" name="itemIds" id="itemIds" style="width: 220px;height: 150px;" >
+					<%-- <c:forEach  var="item"   items="${item}">
+						 	<c:if test="${!empty item}">  
+								<option value="${item.id}">${item.name}</option>
+			             	</c:if>
+		             </c:forEach> --%>
+				</select>
 			</reps:formfield>
 			<reps:formfield label="考核材料" fullRow="true">
-					<input type="text" name="fileName" id="fileName"/>
-					<input type="hidden" name="fileUrl" id="fileUrl"/>
-					<input type="hidden" name="fileType" id="fileType"/>
-					<input type="hidden" name="fileSize" id="fileSize"/>
+					<input type="text" name="fileName" id="fileName" value="${file.fileName }"/>
+					<input type="hidden" name="fileUrl" id="fileUrl" value="${file.fileUrl }"/>
+					<input type="hidden" name="fileType" id="fileType" value="${file.fileType }"/>
+					<input type="hidden" name="fileSize" id="fileSize" value="${file.fileSize }"/>
+					<input type="hidden" name="fileid" id="fileid" value="${file.id }"/>
 					<reps:upload id="file1" callBack="getPathNameOne"  value="上传文件"  flagAbsolute="true"  path="${uploadPath}" cssClass="uploading-a" fileType="txt,doc" coverage="true" size="2"></reps:upload>
 			</reps:formfield>
 		</reps:formcontent>
@@ -72,7 +82,16 @@
 	</reps:panel>
 </reps:container>
 	<script type="text/javascript">
-		
+			
+	 	$(function () {
+	 		<c:forEach  items="${listkhrId}" var="listkhrId">
+	 			<c:if test="${!empty listkhrId}">  
+					var a ="${listkhrId}";
+					$("#"+a).prop("checked",true);
+	         	</c:if>
+         </c:forEach>
+	 	});
+
 		var my = function(data){
 			messager.message(data, function(){ back(); });
 		};
@@ -87,10 +106,12 @@
 				$("#fileType").val(fileType);
 				$("#fileSize").val(fileSize);
 				$("#fileUrl").val(path);
+				$("#fileid").val("");
 		};
 		$(function(){
 			/*选中双击去右边*/
 			$("#itemId:first").dblclick(function(){
+				
 				$("#itemId:first>option:selected").appendTo($("#itemIds"));
 			});
 			/*选中双击去左边*/

@@ -21,15 +21,15 @@ table.gridtable th {
 	border-width: 1px;
 	padding: 8px;
 	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
+	border-color: #d0d0d0;
+	background-color: #EEE;
 }
 
 table.gridtable td {
 	border-width: 1px;
 	padding: 8px;
 	border-style: solid;
-	border-color: #666666;
+	border-color: #ededed;
 	background-color: #ffffff;
 }
 </style>
@@ -64,7 +64,7 @@ table.gridtable td {
 									<td><c:if test="${level.level == '1'}">一级</c:if><c:if test="${level.level == '2'}">二级</c:if><c:if test="${level.level == '3'}">三级</c:if><c:if test="${level.level == '4'}">四级</c:if><c:if test="${level.level == '5'}">五级</c:if><c:if test="${level.level == '6'}">六级</c:if></td>
 									<td>${level.name }</td>
 									<td>${level.personNames }</td>
-									<td><input class="txtInput integernum required" name="levelWeight${status.count }" style="width:176px" value="" levelId="${level.id }"></td>
+									<td><input class="txtInput integernum required" name="levelWeight${status.count }" style="width:200px" value="" levelId="${level.id }" max="100" min="0"></td>
 								</tr>
 							</c:forEach>
 						</tbody>

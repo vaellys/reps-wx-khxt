@@ -2,6 +2,7 @@ package com.reps.khxt.service;
 
 import java.util.List;
 
+import com.reps.core.exception.RepsException;
 import com.reps.core.orm.ListResult;
 import com.reps.khxt.entity.KhxtGroup;
 
@@ -80,5 +81,21 @@ public interface IKhxtGroupService {
 	 * @return KhxtGroup
 	 */
 	List<KhxtGroup> getByLvelId(String khrid);
+
+	/**
+	 * 检查级别是否存在
+	 * @param levelId
+	 * @return boolean
+	 * @throws RepsException
+	 */
+	public boolean checkLevelExist(String levelId) throws RepsException;
+
+	/**
+	 * 检查人员ID是否存在
+	 * @param personId
+	 * @return boolean
+	 * @throws RepsException
+	 */
+	public boolean checkPersonIdExist(String personId) throws RepsException;
 
 }

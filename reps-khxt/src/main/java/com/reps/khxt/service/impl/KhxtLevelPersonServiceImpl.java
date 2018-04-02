@@ -15,6 +15,7 @@ import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtLevelPersonDao;
 import com.reps.khxt.entity.KhxtLevel;
 import com.reps.khxt.entity.KhxtLevelPerson;
+import com.reps.khxt.service.IKhxtGroupService;
 import com.reps.khxt.service.IKhxtLevelPersonService;
 import com.reps.khxt.vo.UserVo;
 import com.reps.system.entity.Account;
@@ -42,6 +43,9 @@ public class KhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 
 	@Autowired
 	IAccountService accountService;
+	
+	@Autowired
+	IKhxtGroupService khxtGroupService;
 
 	@Override
 	public void save(KhxtLevelPerson khxtLevelPerson) throws RepsException {
@@ -98,6 +102,14 @@ public class KhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 	@Override
 	public void deleteAll(String ids) throws RepsException {
 		if (StringUtil.isNotBlank(ids)) {
+			for (String id : ids.split(",")) {
+				KhxtLevelPerson khxtLevelPerson = dao.get(id);
+				if(null != khxtLevelPerson) {
+					if(khxtGroupService.checkPersonIdExist(khxtLevelPerson.getPersonId())) {
+						throw new RepsException("该人员已经被分组");
+					}
+				}
+			}
 			dao.batchDelete(ids);
 		}
 	}

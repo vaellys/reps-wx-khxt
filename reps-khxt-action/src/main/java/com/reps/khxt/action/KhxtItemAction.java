@@ -43,6 +43,7 @@ public class KhxtItemAction extends BaseAction {
 		mav.addObject("categoryMap", categoryMap);
 		// 分页数据
 		mav.addObject("list", listResult.getList());
+		mav.addObject("item", khxtItem);
 		// 分页参数
 		pager.setTotalRecord(listResult.getCount().longValue());
 		mav.addObject("pager", pager);
@@ -88,7 +89,7 @@ public class KhxtItemAction extends BaseAction {
 	@RequestMapping(value = "/toedit")
 	public ModelAndView toEdit(String id) {
 		ModelAndView mav = getModelAndView("/khxt/item/edit");
-		KhxtItem item = khxtItemService.get(id);
+		KhxtItem item = khxtItemService.get(id, false);
 		//构建指标类型MAP
 		Map<String, String> categoryMap = buildCategoryMap(khxtCategoryService.findAll());
 		mav.addObject("item", item);
@@ -126,7 +127,7 @@ public class KhxtItemAction extends BaseAction {
 	public Object show(String id) {
 		try {
 			ModelAndView mav = new ModelAndView("/khxt/item/show");
-			KhxtItem khxtItem = khxtItemService.get(id);
+			KhxtItem khxtItem = khxtItemService.get(id, false);
 			mav.addObject("item", khxtItem);
 			return mav;
 		} catch (Exception e) {

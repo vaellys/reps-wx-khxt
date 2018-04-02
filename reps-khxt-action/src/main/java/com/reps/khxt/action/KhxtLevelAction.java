@@ -47,6 +47,7 @@ public class KhxtLevelAction extends BaseAction {
 		mav.addObject("categoryMap", categoryMap);
 		// 分页数据
 		mav.addObject("list", listResult.getList());
+		mav.addObject("level", khxtLevel);
 		// 分页参数
 		pager.setTotalRecord(listResult.getCount().longValue());
 		mav.addObject("pager", pager);

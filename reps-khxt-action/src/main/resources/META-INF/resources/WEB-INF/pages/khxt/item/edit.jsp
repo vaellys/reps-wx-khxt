@@ -18,7 +18,7 @@
 				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:300px" readonly="true">${item.name }</reps:input>
 			</reps:formfield>
 			<reps:formfield label="分数" fullRow="true">
-				<reps:input name="point" dataType="moneyvalidate" maxLength="6" required="true" style="width:300px">${item.point }</reps:input>
+				<reps:input name="point" dataType="moneyvalidate" maxLength="6" required="true" style="width:300px"><fmt:formatNumber value="${item.point}" pattern="#.#"/></reps:input>
 			</reps:formfield>
 		</reps:formcontent>
 		</br></br>

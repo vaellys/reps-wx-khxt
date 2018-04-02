@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import com.reps.core.orm.IGenericDao;
 import com.reps.core.orm.ListResult;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.entity.KhxtGroup;
-import com.reps.khxt.entity.KhxtItem;
 
 /**
  * 考核分组设置dao
@@ -55,10 +53,13 @@ public class KxhtGroupDao {
 		dao.update(group);
 	}
 
-	public List<KhxtGroup> getByLvelId(String khrid) {
+	public List<KhxtGroup> getByLvelId(String khrid, String bkhrid) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtGroup.class);
 		if (StringUtils.isNotBlank(khrid)) {
 			dc.add(Restrictions.eq("khrId", khrid));
+		}
+		if (StringUtils.isNotBlank(bkhrid)) {
+			dc.add(Restrictions.eq("bkhrId", bkhrid));
 		}
 		List<KhxtGroup> list = dao.findByCriteria(dc);
 		if (CollectionUtils.isEmpty(list)) {
@@ -66,5 +67,24 @@ public class KxhtGroupDao {
 		}
 		return list;
 	}
-
+	
+	public int countLevelIds(String levelId) {
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtGroup.class);
+		if (StringUtil.isNotBlank(levelId)) {
+			dc.add(Restrictions.or(Restrictions.eq("khrId", levelId), Restrictions.eq("bkhrId", levelId)));
+		}
+		return dao.getRowCount(dc).intValue();
+	}
+	
+	public List<KhxtGroup> find(KhxtGroup khxtgroup) {
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtGroup.class);
+		if(null != khxtgroup) {
+			Short isEnable = khxtgroup.getIsEnable();
+			if(null != isEnable) {
+				dc.add(Restrictions.eq("isEnable", isEnable));
+			}
+		}
+		return dao.findByCriteria(dc);
+	}
+	
 }
