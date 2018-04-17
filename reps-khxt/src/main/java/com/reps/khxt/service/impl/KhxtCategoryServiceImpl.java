@@ -30,14 +30,16 @@ public class KhxtCategoryServiceImpl implements IKhxtCategoryService {
 	IKhxtItemService khxtItemService;
 
 	@Override
-	public void save(KhxtCategory khxtCategory) throws RepsException {
+	public boolean save(KhxtCategory khxtCategory) throws RepsException {
+		
 		if(null == khxtCategory) {
 			throw new RepsException("数据异常");
 		}
 		if(!this.checkCategoryNameExists(khxtCategory)) {
 			dao.save(khxtCategory);
+			return true;
 		} else {
-			throw new RepsException("类别名称已存在，请重新输入");
+			return false;
 		}
 	}
 

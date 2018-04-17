@@ -106,7 +106,7 @@ public class KhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 				KhxtLevelPerson khxtLevelPerson = dao.get(id);
 				if(null != khxtLevelPerson) {
 					if(khxtGroupService.checkPersonIdExist(khxtLevelPerson.getPersonId())) {
-						throw new RepsException("该人员已经被分组");
+						throw new RepsException("所选人员中有被分组的");
 					}
 				}
 			}
@@ -141,9 +141,9 @@ public class KhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 		if (null != list && !list.isEmpty()) {
 			for (KhxtLevelPerson khxtLevelPerson : list) {
 				sb.append(khxtLevelPerson.getPersonName());
-				sb.append(",");
+				sb.append("，");
 			}
-			sb.deleteCharAt(sb.toString().lastIndexOf(","));
+			sb.deleteCharAt(sb.toString().lastIndexOf("，"));
 		}
 		return sb.toString();
 	}

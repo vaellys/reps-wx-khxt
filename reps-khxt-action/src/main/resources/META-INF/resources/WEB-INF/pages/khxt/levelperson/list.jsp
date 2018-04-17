@@ -8,7 +8,7 @@
 </head>
 <body>
 	<reps:container layout="true">
-		<reps:panel title="" id="top" dock="top" method="post"
+		<reps:panel  id="top" dock="top" method="post"
 			action="list.mvc?levelId=${levelId }" formId="queryForm">
 			<reps:formcontent parentLayout="true" style="width:80%;">
 				<reps:formfield label="名称" labelStyle="width:20%;"
@@ -23,9 +23,8 @@
 			<reps:footbar>
 				<input type="hidden" name="levelPersonIds" />
 				<sys:user id="user" hideId="hideId" hideName="hideName"
-					hideNameValue="" nameValue=""
-					url="multiple.mvc?levelId=${levelId}" multiple="true" name="人员选择"
-					cssClass="add-a" callBack="userCallBack">新增</sys:user>
+					hideNameValue="" nameValue="" url="multiple.mvc?levelId=${levelId}" multiple="true" name="人员选择"
+					cssClass="add-a" callBack="userCallBack">人员选择</sys:user>
 				<reps:ajax cssClass="delete-a" confirm="确认批量删除吗?"
 					beforeCall="checkChecked" formId="queryForm" callBack="my"
 					value="批量删除" />
@@ -70,7 +69,7 @@
 
 		var checkChecked = function() {
 			if ($("input[type=checkbox][name=ids]:checked").length == 0) {
-				messager.info("请选择要批量删除的账号");
+				messager.info("请选择要批量删除的人员");
 				return false;
 			}
 			var levelPersonObj = $("input[type=hidden][name=levelPersonIds]");
@@ -97,6 +96,10 @@
 		var back = function() {
 			window.location.href = "list.mvc?levelId=${levelId }";
 		}
+		$(function(){
+			$("a:eq(1)").attr('title','选择人员');
+			$("a:eq(1) span").text('选择人员');
+		});
 	</script>
 </body>
 </html>

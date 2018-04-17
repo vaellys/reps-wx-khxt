@@ -5,17 +5,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
-import java.util.List;
-
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.reps.core.orm.IGenericDao;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.entity.KhxtKhrProcess;
-import com.reps.khxt.entity.KhxtLevelPerson;
 
 /**
  * 考核人打分情况表

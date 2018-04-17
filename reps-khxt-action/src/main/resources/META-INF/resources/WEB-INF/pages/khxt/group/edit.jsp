@@ -22,7 +22,7 @@
 			
 			<reps:formfield label="考核人姓名" fullRow="true">
 				<input name="khrIds" type="hidden" value="${group.khrIds }"/>
-				<reps:input name="khr" minLength="2" maxLength="20" required="true" readonly="true" style="width:300px;height:100px">${group.khr}</reps:input>
+				<reps:input name="khr"  required="true" readonly="true" style="width:300px;height:100px">${group.khr}</reps:input>
 
 				<sys:user id="user" hideId="hideId" hideName="hideName"
 					hideNameValue="" nameValue=""
@@ -36,7 +36,7 @@
 			
 			<reps:formfield label="考被核人姓名" fullRow="true">
 				<input name="bkhrIds" type="hidden" value="${group.bkhrIds }"/>
-			<reps:input name="bkhr" minLength="2" maxLength="20" required="true" readonly="true" style="width:300px;height:100px">${group.bkhr}</reps:input>
+			<reps:input name="bkhr"  required="true" readonly="true" style="width:300px;height:100px">${group.bkhr}</reps:input>
 				
 				<sys:user id="buser" hideId="bhideId" hideName="bhideName"
 					hideNameValue="" nameValue=""
@@ -45,7 +45,7 @@
 			</reps:formfield>
 		
 			<reps:formfield label="是否参与考核" fullRow="true">
-				<reps:select jsonData="{'':'请选择','1':'参与','0':'暂时不参与'}" name="isEnable" required="true" style="width:304px"><c:if test="${khxtgroup.isEnable == '1'}">参与</c:if><c:if test="${khxtgroup.isEnable == '0'}">不参与</c:if></reps:select>
+				<reps:select jsonData="{'':'请选择','1':'参与','0':'暂时不参与'}" name="isEnable" required="true" style="width:304px">${group.isEnable}</reps:select>
 			</reps:formfield>
 		
 		</reps:formcontent>
@@ -60,6 +60,25 @@
 </reps:container>
 <script type="text/javascript">
 
+	$(function(){
+		var a =$("#khrlevelid").val();
+		$('#hideId').val(a);
+		
+		var a =$("#bkhrlevelid").val();
+		$('#bhideId').val(a);
+		
+		$("#khrlevelid").click(function(){
+			var a =$("#khrlevelid").val();
+			$('#hideId').val(a);
+			
+		})
+		$("#bkhrlevelid").click(function(){
+			var a =$("#bkhrlevelid").val();
+			$('#bhideId').val(a);
+			
+		})
+	});
+
 	var userCallBack = function() {
 		
 		 $("input[name=khrIds]").val("");
@@ -69,6 +88,9 @@
 		
 		 $("input[name=khrIds]").val(p[0]);
 		 $("input[name=khr]").val(p[1]);
+		 
+		 var a =$("#khrlevelid").val();
+			$('#hideId').val(a);
 	};
 	var buserCallBack = function() {
 		
@@ -79,6 +101,9 @@
 		
 		 $("input[name=bkhrIds]").val(p[0]);
 		 $("input[name=bkhr]").val(p[1]);
+		 
+		 var a =$("#bkhrlevelid").val();
+			$('#bhideId').val(a);
 	};
 
 	var skip = function(data) {

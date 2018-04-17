@@ -1,8 +1,11 @@
 package com.reps.khxt.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.reps.core.exception.RepsException;
+import com.reps.core.orm.ListResult;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtPerformanceMembersDao;
 import com.reps.khxt.entity.KhxtItem;
@@ -22,6 +26,7 @@ import com.reps.khxt.entity.KhxtPerformancePoint;
 import com.reps.khxt.enums.AppraiseStatus;
 import com.reps.khxt.enums.MarkStatus;
 import com.reps.khxt.service.IKhxtKhrProcessService;
+import com.reps.khxt.service.IKhxtLevelPersonService;
 import com.reps.khxt.service.IKhxtPerformanceMembersService;
 import com.reps.khxt.service.IKhxtPerformancePointService;
 
@@ -43,16 +48,19 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	@Autowired
 	private IKhxtKhrProcessService khxtKhrProcessService;
 
+	@Autowired
+	private IKhxtLevelPersonService personService;
+
 	@Override
 	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers khxtPerformanceMembers, boolean eager)
 			throws RepsException {
 		if (null == khxtPerformanceMembers) {
 			throw new RepsException("参数异常");
 		}
-		String khrPersonId = khxtPerformanceMembers.getKhrPersonId();
+		/*String khrPersonId = khxtPerformanceMembers.getKhrPersonId();
 		if (StringUtil.isBlank(khrPersonId)) {
 			throw new RepsException("参数异常:考核人ID为空");
-		}
+		}*/
 		List<KhxtPerformanceMembers> resultList = dao.find(khxtPerformanceMembers);
 		if (eager) {
 			if (null != resultList && !resultList.isEmpty()) {
@@ -114,7 +122,6 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 			khxtKhrProcess.setStatus(MarkStatus.FINISHED_MARKING.getId().intValue());
 			khxtKhrProcessService.updateStatus(khxtKhrProcess);
 		}
-
 	}
 
 	@Override
@@ -151,12 +158,6 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	}
 
 	@Override
-	public List<KhxtPerformanceMembers> findByBkhrPersonId(KhxtPerformanceMembers members) {
-
-		return dao.find(members);
-	}
-
-	@Override
 	public boolean checkAppraiseFinished(KhxtPerformanceMembers khxtPerformanceMembers) throws RepsException {
 		String sheetId = khxtPerformanceMembers.getSheetId();
 		if (StringUtil.isBlank(sheetId)) {
@@ -168,6 +169,60 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 		}
 		return 0 < dao.count(sheetId, khrPersonId, AppraiseStatus.UN_REPORTED.getId(), AppraiseStatus.REPORTED.getId())
 				? false : true;
+	}
+
+	@Override
+	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers members) {
+		List<KhxtPerformanceMembers> list = dao.find(members);
+
+		if (null != list && !list.isEmpty()) {
+			for (KhxtPerformanceMembers member : list) {
+				Hibernate.initialize(member.getPerformancePoints());
+			}
+		}
+
+		return list;
+	}
+
+	@Override
+	public List<String> findByGroup(KhxtPerformanceMembers members) throws RepsException {
+		return dao.findByGroup(members);
+	}
+
+	@Override
+	public ListResult<KhxtPerformanceMembers> query(int startRow, int pageSize,
+			KhxtPerformanceMembers khxtPerformanceMembers) {
+		ListResult<KhxtPerformanceMembers> listResult = dao.query(startRow, pageSize, khxtPerformanceMembers);
+
+		List<KhxtPerformanceMembers> listMembers1 = listResult.getList();
+		// 保存机构名称
+		for (KhxtPerformanceMembers  members: listMembers1) {
+			members.setPersonOrganize(personService.getByPersonId(members.getBkhrPersonId()).getOrganize().getName());
+		}
+		List<KhxtPerformanceMembers> listMembers = new ArrayList<>();
+
+		//处理重复数据
+		Map<String, KhxtPerformanceMembers> map = new LinkedHashMap<>();
+		for (KhxtPerformanceMembers members1 : listMembers1) {
+
+			for (KhxtPerformanceMembers members2 : listMembers1) {
+				
+				if (StringUtil.equals(members1.getSheetId(), members2.getSheetId())) {
+
+					map.put(members2.getSheetId() + members2.getBkhrPersonId(), members2);
+				}
+			}
+
+		}
+
+		for (String key : map.keySet()) {
+			listMembers.add(map.get(key));
+		}
+
+		listResult.setList(listMembers);
+		listResult.setCount((long) listMembers.size());
+
+		return listResult;
 	}
 
 }

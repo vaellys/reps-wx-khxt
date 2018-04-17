@@ -8,7 +8,7 @@
 </head>
 <body>
 <reps:container layout="true">
-	<reps:panel title="" id="top" dock="top" method="post" action="list.mvc" formId="queryForm">
+	<reps:panel  id="top" dock="top" method="post" action="list.mvc" formId="queryForm">
 		<reps:formcontent parentLayout="true" style="width:80%;">
 			<reps:formfield label="分类名称" labelStyle="width:20%;" textStyle="width:27%;">
 				<reps:input name="name">${category.name }</reps:input>

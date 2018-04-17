@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -11,9 +12,12 @@ import org.springframework.util.CollectionUtils;
 
 import com.reps.core.exception.RepsException;
 import com.reps.core.orm.IGenericDao;
+import com.reps.core.orm.ListResult;
+import com.reps.core.util.DateUtil;
 import com.reps.core.util.StringUtil;
+import com.reps.khxt.entity.KhxtAppraiseSheet;
 import com.reps.khxt.entity.KhxtPerformanceMembers;
-import com.reps.khxt.entity.KhxtPerformanceWork;
+import com.reps.system.entity.Person;
 
 /**
  * 
@@ -46,6 +50,7 @@ public class KhxtPerformanceMembersDao {
 
 	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers khxtPerformanceMembers) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
+		dc.createAlias("appraiseSheet", "p");
 		if (null != khxtPerformanceMembers) {
 			String khrPersonId = khxtPerformanceMembers.getKhrPersonId();
 			if (StringUtil.isNotBlank(khrPersonId)) {
@@ -63,8 +68,33 @@ public class KhxtPerformanceMembersDao {
 			if (null != bkhrPersonId) {
 				dc.add(Restrictions.eq("bkhrPersonId", bkhrPersonId));
 			}
+			KhxtAppraiseSheet sheet = khxtPerformanceMembers.getAppraiseSheet();
+			if (sheet != null) {
+				String name = sheet.getName();
+				if (StringUtils.isNotBlank(name)) {
+					dc.add(Restrictions.eq("p.name", name));
+				}
+				String season = sheet.getSeason();
+				if (StringUtils.isNotBlank(season)) {
+					dc.add(Restrictions.eq("p.season", season));
+				}
+			}
 		}
 		return dao.findByCriteria(dc);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<String> findByGroup(KhxtPerformanceMembers khxtPerformanceMembers) {
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
+		dc.createAlias("appraiseSheet", "s");
+		dc.setProjection(Projections.groupProperty("bkhrPersonId"));
+		if(null != khxtPerformanceMembers) {
+			String sheetId = khxtPerformanceMembers.getSheetId();
+			if(StringUtil.isNotBlank(sheetId)) {
+				dc.add(Restrictions.eq("s.id", sheetId));
+			}
+		}
+		return dc.getExecutableCriteria(dao.getSession()).list();
 	}
 
 	public List<KhxtPerformanceMembers> findBySheetId(String sheetId) {
@@ -83,16 +113,45 @@ public class KhxtPerformanceMembersDao {
 
 	public int count(String sheetId, String personId, Short... status) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
-		if(StringUtil.isNotBlank(sheetId)) {
+		if (StringUtil.isNotBlank(sheetId)) {
 			dc.add(Restrictions.eq("sheetId", sheetId));
 		}
-		if(StringUtil.isNotBlank(personId)) {
+		if (StringUtil.isNotBlank(personId)) {
 			dc.add(Restrictions.eq("khrPersonId", personId));
 		}
-		if(null != status) {
+		if (null != status) {
 			dc.add(Restrictions.in("status", status));
 		}
 		return dao.getRowCount(dc).intValue();
 	}
-	
+
+	public ListResult<KhxtPerformanceMembers> query(int startRow, int pageSize,	KhxtPerformanceMembers khxtPerformanceMembers) {
+		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
+		dc.createAlias("appraiseSheet", "sheet");
+		dc.createAlias("bkhrPerson", "person");
+
+		if (null != khxtPerformanceMembers) {
+			KhxtAppraiseSheet sheet = khxtPerformanceMembers.getAppraiseSheet();
+			if (sheet != null) {
+				String beginDate = sheet.getBeginDate();
+				if (StringUtils.isNotBlank(beginDate)) {
+					dc.add(Restrictions.eq("sheet.beginDate", DateUtil.formatStrDateTime(beginDate, "yyyy年MM月dd日", "yyyyMMdd")));
+				}
+
+				String endEate = sheet.getEndEate();
+				if (StringUtils.isNotBlank(endEate)) {
+					dc.add(Restrictions.eq("sheet.endEate", DateUtil.formatStrDateTime(endEate, "yyyy年MM月dd日", "yyyyMMdd")));
+				}
+			}
+			Person bkhrPerson = khxtPerformanceMembers.getBkhrPerson();
+			if (bkhrPerson != null) {
+				String name = bkhrPerson.getName();
+				if (StringUtil.isNotBlank(name)) {
+					dc.add(Restrictions.eq("person.name", name));
+				}
+			}
+		}
+		return dao.query(dc, startRow, pageSize);
+	}
+
 }

@@ -4,10 +4,10 @@ import com.reps.core.RepsContext;
 
 public class ConfigurePath {
 
-	/**图片上传路径*/
-	public static final String IMG_UPLOAD_PATH = RepsContext.getConst("khxt", "imageUploadPath");
+	/**附件上传路径*/
+	public static final String ATTACHMENT_UPLOAD_PATH = RepsContext.getConst("khxt", "attachmentUploadPath");
 	
-	/**图片访问路径*/
-	public static final String IMG_FILE_PATH = RepsContext.getConst("khxt", "imagePath");
+	/**附件访问路径*/
+	public static final String ATTACHMENT_FILE_PATH = RepsContext.getConst("khxt", "attachmentFilePath");
 	
 }

@@ -26,7 +26,7 @@ public class KhxtKhrProcess extends IdEntity implements Serializable {
 	 */
 	private static final long serialVersionUID = -7242874814747880345L;
 
-	/** 被考核人级别ID */
+	/** 被考核人personId */
 	@Column(name = "khr_person_id", length = 32)
 	private String khrPersonId;
 

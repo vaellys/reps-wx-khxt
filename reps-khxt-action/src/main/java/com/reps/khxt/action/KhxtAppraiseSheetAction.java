@@ -1,16 +1,22 @@
 package com.reps.khxt.action;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +31,7 @@ import com.reps.core.RepsConstant;
 import com.reps.core.commons.Pagination;
 import com.reps.core.exception.RepsException;
 import com.reps.core.orm.ListResult;
+import com.reps.core.util.DateUtil;
 import com.reps.core.util.StringUtil;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
@@ -33,18 +40,28 @@ import com.reps.khxt.entity.KhxtAppraiseSheetFile;
 import com.reps.khxt.entity.KhxtItem;
 import com.reps.khxt.entity.KhxtLevel;
 import com.reps.khxt.entity.KhxtLevelWeight;
+import com.reps.khxt.entity.KhxtPerformanceMembers;
 import com.reps.khxt.entity.KhxtPerformanceWork;
+import com.reps.khxt.enums.ProgressStatus;
 import com.reps.khxt.service.IKhxtAppraiseSheetFileService;
 import com.reps.khxt.service.IKhxtAppraiseSheetService;
+import com.reps.khxt.service.IKhxtGroupService;
 import com.reps.khxt.service.IKhxtItemService;
 import com.reps.khxt.service.IKhxtKhrProcessService;
 import com.reps.khxt.service.IKhxtLevelService;
 import com.reps.khxt.service.IKhxtLevelWeightService;
+import com.reps.khxt.service.IKhxtPerformanceMembersService;
 import com.reps.khxt.service.IKhxtPerformanceWorkService;
+import com.reps.khxt.util.ConfigurePath;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+/**
+ * 月考核管理
+ * 
+ * @author ：Alex
+ */
 @Controller
 @RequestMapping(value = RepsConstant.ACTION_BASE_PATH + "/khxt/appraise")
 public class KhxtAppraiseSheetAction extends BaseAction {
@@ -61,7 +78,7 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 
 	@Autowired
 	private IKhxtItemService itemService;
-	
+
 	@Autowired
 	private IKhxtKhrProcessService KhxtKhrProcessService;
 
@@ -71,22 +88,36 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 	@Autowired
 	private IKhxtPerformanceWorkService workService;
 
-	@RequestMapping(value = "/list")
-	public ModelAndView list(Pagination pager, KhxtAppraiseSheet sheet) {
-		ModelAndView mav = getModelAndView("/khxt/appraise/list");
-		ListResult<KhxtAppraiseSheet> listResult = sheetService.query(pager.getStartRow(), pager.getPageSize(), sheet,false);
+	@Autowired
+	private IKhxtPerformanceMembersService memberService;
 
+	@Autowired
+	private IKhxtGroupService groupService;
+
+	/**
+	 * 月考核列表
+	 * 
+	 * @author Alex
+	 * @param pager
+	 * @param sheet
+	 * @return
+	 * @throws Exception
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value = "/khrlist")
+	public ModelAndView khrlist(Pagination pager, KhxtAppraiseSheet sheet) throws Exception {
+		ModelAndView mav = getModelAndView("/khxt/appraise/khrlist");
+		ListResult<KhxtAppraiseSheet> listResult = sheetService.query(pager.getStartRow(), pager.getPageSize(), sheet);
 		Map<String, String> LevelMap = buildLevelMap(khxtlevelService.findAll());
 
 		// 考核进度
 		Map<String, String> status = new HashMap<>();
-		status.put("", "请选择");
-		status.put("0", "未完成");
-		status.put("1", "已完成");
-		status.put("2", "已选择");
+		status.put("", "");
+		status.put("0", ProgressStatus.UN_FINISHED.getStatus());
+		status.put("1", ProgressStatus.FINISHED.getStatus());
+		status.put("2", ProgressStatus.HAS_OVER.getStatus());
 		// 考核年月
 		Map<String, String> year = getYear();
-
 		// 分页数据
 		mav.addObject("list", listResult.getList());
 		// 考核对象
@@ -99,30 +130,116 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		return mav;
 	}
 
-	@RequestMapping(value = "/count")
-	public ModelAndView count(Pagination pager, KhxtAppraiseSheet sheet) {
-		ModelAndView mav = getModelAndView("/khxt/appraise/list");
-		ListResult<KhxtAppraiseSheet> listResult = sheetService.query(pager.getStartRow(), pager.getPageSize(), sheet,true);
+	/**
+	 * 上报月考核列表
+	 * 
+	 * @author Alex
+	 * @param sheet
+	 * @return
+	 * @throws Exception
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value = "/bkhrlist")
+	public ModelAndView bkhrlist(KhxtAppraiseSheet sheet) throws Exception {
+		ModelAndView mav = getModelAndView("/khxt/appraise/bkhrlist");
+		// 查询指定人员信息
+		LoginToken loginToken = getCurrentToken();
+		if (null == loginToken) {
+			throw new RepsException("您还没有登陆！");
+		}
+		KhxtPerformanceMembers members = new KhxtPerformanceMembers();
+		if (StringUtils.isBlank(loginToken.getPersonId())) {
+			throw new RepsException("考核人ID不存在！");
+		}
+		// 封装查询条件
+		members.setBkhrPersonId(loginToken.getPersonId());
+		if (StringUtil.isNotBlank(sheet.getName()) || StringUtil.isNotBlank(sheet.getSeason())) {
+			members.setAppraiseSheet(sheet);
+		}
+		List<KhxtPerformanceMembers> list = memberService.find(members);
+		List<KhxtAppraiseSheet> listResult = new ArrayList<>();
 
-		Map<String, String> LevelMap = buildLevelMap(khxtlevelService.findAll());
+		if (!CollectionUtils.isEmpty(list)) {
+			Map<String, KhxtAppraiseSheet> map = new HashMap<>();
+			for (KhxtPerformanceMembers khxtPerformanceMembers : list) {
+				KhxtAppraiseSheet appraiseSheet = sheetService.get(khxtPerformanceMembers.getSheetId());
+				// 处理日期
+				String endEate = appraiseSheet.getEndEate();
+				appraiseSheet.setEndEate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
+				appraiseSheet.setStatus(Integer.valueOf(khxtPerformanceMembers.getStatus()));
+				// 过滤数据
+				map.put(appraiseSheet.getId(), appraiseSheet);
+			}
+			for (String key : map.keySet()) {
+				listResult.add(map.get(key));
+			}
+		}
 		// 考核年月
 		Map<String, String> year = getYear();
-
 		// 分页数据
-		mav.addObject("list", listResult.getList());
-		// 考核对象
-		mav.addObject("levelMap", LevelMap);
+		mav.addObject("list", listResult);
+
 		mav.addObject("season", year);
-		// 分页参数
-		pager.setTotalRecord(listResult.getCount().longValue());
-		mav.addObject("pager", pager);
 		return mav;
 	}
 
+	/**
+	 * 考核表情况列表
+	 * 
+	 * @author Alex
+	 * @date 2018年4月12日
+	 * @param sheet
+	 * @return
+	 * @throws Exception
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value = "/assessslist")
+	public ModelAndView bkhrQuery(Pagination pager, KhxtAppraiseSheet sheet) throws Exception {
+		// 查询考核人员名单
+		ModelAndView mav = khrlist(pager, sheet);
+
+		mav.setViewName("/khxt/assessdetail/list");
+
+		// 查询考核人级别
+		Short[] b = { 1, 3 };
+		List<KhxtLevel> khr = khxtlevelService.findByPower(b);
+		// 考核对象级别
+		Short[] k = { 2, 3 };
+		List<KhxtLevel> bkhr = khxtlevelService.findByPower(k);
+
+		Map<String, String> khrMap = buildLevelMap(khr);
+		Map<String, String> bkhrMap = buildLevelMap(bkhr);
+		mav.addObject("khrMap", khrMap);
+		mav.addObject("bkhrMap", bkhrMap);
+		return mav;
+	}
+
+	/**
+	 * 统计进度
+	 * 
+	 * @author Alex
+	 * @param pager
+	 * @param sheet
+	 * @return
+	 * @throws Exception
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value = "/count")
+	public ModelAndView count(Pagination pager, KhxtAppraiseSheet sheet) throws Exception {
+		List<KhxtAppraiseSheet> listResult = sheetService.count();
+
+		for (KhxtAppraiseSheet khxtAppraiseSheet : listResult) {
+			sheetService.update(khxtAppraiseSheet);
+		}
+		ModelAndView mav = khrlist(pager, sheet);
+
+		return mav;
+	}
+
+	// 封装级别设置
 	private Map<String, String> buildLevelMap(List<KhxtLevel> list) {
 
 		Map<String, String> levelMap = new HashMap<>();
-		levelMap.put(" ", "全部");
 		for (KhxtLevel khxtlevel : list) {
 			levelMap.put(khxtlevel.getId(), khxtlevel.getName());
 		}
@@ -133,10 +250,10 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 	public Object toAdd() {
 		try {
 			ModelAndView mav = getModelAndView("/khxt/appraise/add");
-			// 查询考核人
+			// 查询考核人级别
 			Short[] b = { 1, 3 };
 			List<KhxtLevel> khr = khxtlevelService.findByPower(b);
-			// 查询被考核人
+			// 查询被考核人级别
 			Short[] k = { 2, 3 };
 			List<KhxtLevel> bkhr = khxtlevelService.findByPower(k);
 			Map<String, String> bkhrMap = buildLevelMap(bkhr);
@@ -147,14 +264,15 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 			// 查询所有指标
 			List<KhxtItem> itemlist = itemService.findAll();
 			// 文件上传地址
-			String path = RepsConstant.getContextProperty("file.http.path");
+			String path = ConfigurePath.ATTACHMENT_UPLOAD_PATH;
 			mav.addObject("uploadPath", path);
 			mav.addObject("khr", khr);
 			mav.addObject("bkhrMap", bkhrMap);
 			mav.addObject("weightMap", weightMap);
 			mav.addObject("itemMap", itemlist);
 			mav.addObject("season", season);
-			mav.addObject("current", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM")));
+			mav.addObject("current", DateUtil.format(new Date(), "yyyyMM"));
+
 			return mav;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -163,13 +281,38 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		}
 	}
 
+	/**
+	 * 添加月考核
+	 * 
+	 * @author Alex
+	 * @param sheet
+	 * @param khrids
+	 * @param itemIds
+	 * @param fileName
+	 * @param fileType
+	 * @param fileSize
+	 * @param fileUrl
+	 * @return
+	 * @return Object
+	 */
 	@RequestMapping(value = "/add")
 	@ResponseBody
-	public Object add(KhxtAppraiseSheet sheet, String[] khrids, String itemIds, KhxtAppraiseSheetFile file) {
+	public Object add(KhxtAppraiseSheet sheet, String[] khrids, String itemIds, String[] fileName, String[] fileType,
+			String[] fileSize, String[] fileUrl) {
 		try {
-
+			List<KhxtAppraiseSheetFile> file = new ArrayList<>();
+			// 封装文件参数
+			for (int i = 0; i < fileName.length; i++) {
+				KhxtAppraiseSheetFile sheetFile = new KhxtAppraiseSheetFile();
+				if (StringUtil.isNotBlank(fileName[i]) && StringUtil.isNotBlank(fileUrl[i])) {
+					sheetFile.setFileName(fileName[i]);
+					sheetFile.setFileType(fileType[i]);
+					sheetFile.setFileSize(Long.valueOf(fileSize[i]));
+					sheetFile.setFileUrl(fileUrl[i].split(":")[1]);
+					file.add(sheetFile);
+				}
+			}
 			sheet.setUserId(getCurrentToken().getUserId());
-
 			sheetService.save(sheet, khrids, itemIds, file);
 
 			return ajax(AjaxStatus.OK, "添加成功");
@@ -184,8 +327,12 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 	public ModelAndView toEdit(String sheetId) {
 		ModelAndView mav = getModelAndView("/khxt/appraise/edit");
 		KhxtAppraiseSheet sheet = sheetService.get(sheetId);
+		// 处理日期
+		sheet.setEndEate(DateUtil.transToDate_yyyyMMdd(sheet.getEndEate()));
+		sheet.setBeginDate(DateUtil.transToDate_yyyyMMdd(sheet.getBeginDate()));
+
 		String[] khrIds = sheet.getKhrId().split(",");
-		 List<String> listkhrId = Arrays.asList(khrIds);
+		List<String> listkhrId = Arrays.asList(khrIds);
 		// 查询考核人
 		Short[] b = { 1, 3 };
 		List<KhxtLevel> khr = khxtlevelService.findByPower(b);
@@ -199,33 +346,69 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		Map<String, String> weightMap = buildWeightMap(WeightService.findAll());
 		// 查询所有指标
 		List<KhxtItem> itemlist = itemService.findAll();
-		// 已选指标
-		Set<KhxtItem> item = sheet.getItem();
 		// 查询考核文件
-		KhxtAppraiseSheetFile file = fileService.findFileBySheetId(sheetId);
+		List<KhxtAppraiseSheetFile> list = fileService.findFileBySheetId(sheetId);
 
-		String path = RepsConstant.getContextProperty("file.http.path");
+		if (CollectionUtils.isEmpty(list)) {
+			List<KhxtAppraiseSheetFile> list1 = new ArrayList<>();
+			KhxtAppraiseSheetFile sheetFile = new KhxtAppraiseSheetFile();
+			sheetFile.setFileName("请上传文件");
+			list1.add(sheetFile);
+			mav.addObject("file", list1);
+		} else {
+			mav.addObject("file", list);
+		}
+		// 文件上传地址
+		String path = ConfigurePath.ATTACHMENT_UPLOAD_PATH;
 		mav.addObject("uploadPath", path);
 		mav.addObject("khr", khr);
 		mav.addObject("listkhrId", listkhrId);
 		mav.addObject("bkhrMap", bkhrMap);
 		mav.addObject("weightMap", weightMap);
 		mav.addObject("itemMap", itemlist);
-		mav.addObject("item", item);
-		mav.addObject("file", file);
 		mav.addObject("sheet", sheet);
 		mav.addObject("season", year);
 		return mav;
 	}
 
+	/**
+	 * 修改月考核
+	 * 
+	 * @author Alex
+	 * @param sheet
+	 * @param khrids
+	 * @param itemIds
+	 * @param fileName
+	 * @param fileType
+	 * @param fileSize
+	 * @param fileUrl
+	 * @param fileid
+	 * @return
+	 * @return Object
+	 */
 	@RequestMapping(value = "/edit")
 	@ResponseBody
-	public Object edit(KhxtAppraiseSheet sheet, String[] khrids, String itemIds, KhxtAppraiseSheetFile file,
-			String sheetId, String fileid) {
+	public Object edit(KhxtAppraiseSheet sheet, String[] khrids, String itemIds, String[] fileName, String[] fileType,
+			String[] fileSize, String[] fileUrl, String[] fileid) {
 		try {
-			sheet.setId(sheetId);
-			file.setId(fileid);
+			List<KhxtAppraiseSheetFile> file = new ArrayList<>();
+			// 分装文件参数
+			if (fileName.length == fileType.length && fileType.length == fileSize.length
+					&& fileSize.length == fileUrl.length) {
+				for (int i = 0; i < fileName.length; i++) {
+					KhxtAppraiseSheetFile sheetFile = new KhxtAppraiseSheetFile();
+					if (StringUtil.isNotBlank(fileName[i]) && StringUtil.isNotBlank(fileUrl[i])) {
+						sheetFile.setFileName(fileName[i]);
+						sheetFile.setFileType(fileType[i]);
+						sheetFile.setFileSize(Long.valueOf(fileSize[i]));
+						sheetFile.setFileUrl(fileUrl[i]);
+						sheetFile.setId(fileid[i]);
+						file.add(sheetFile);
+					}
+				}
+			}
 			sheetService.update(sheet, khrids, itemIds, file);
+
 			return ajax(AjaxStatus.OK, "修改成功");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -242,11 +425,19 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 			return ajax(AjaxStatus.OK, "删除成功");
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error("删除分类失败", e);
+			logger.error("删除失败", e);
 			return ajax(AjaxStatus.ERROR, e.getMessage());
 		}
 	}
 
+	/**
+	 * 跳转到上报月考核计划页面
+	 * 
+	 * @author Alex
+	 * @param sheetId
+	 * @return
+	 * @return Object
+	 */
 	@RequestMapping(value = "/toWorkPlan")
 	public Object toWorkPlan(String sheetId) {
 
@@ -254,7 +445,6 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		KhxtAppraiseSheet sheet = sheetService.get(sheetId);
 		// 查询工作绩效
 		String personId = getCurrentToken().getPersonId();
-		personId = "4028daac609229ac016121e0bca80b66";
 		KhxtPerformanceWork khxtPerformanceWork = new KhxtPerformanceWork();
 		khxtPerformanceWork.setSheetId(sheet.getId());
 		khxtPerformanceWork.setPersonId(personId);
@@ -273,6 +463,8 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 			List<Map<String, String>> listWork = getListWork(plan, excu);
 			mav.addObject("listWork", listWork);
 			mav.addObject("workId", work.getId());
+		} else {
+			mav.addObject("work", "work");
 		}
 
 		mav.addObject("sheet", sheet);
@@ -312,44 +504,63 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		return list;
 	}
 
+	/**
+	 * 上报工作计划
+	 * 
+	 * @author Alex
+	 * @date 2018年4月12日
+	 * @param planning
+	 * @param execution
+	 * @param sheetId
+	 * @param appear
+	 * @param workId
+	 * @return
+	 * @return Object
+	 */
 	@RequestMapping(value = "/addWorkPlan")
-	public void addWorkPlan(String[] planning, String[] execution, String sheetId, String appear, String workId) {
-		String personId = getCurrentToken().getPersonId();
-		personId = "4028daac609229ac016121e0bca80b66";
-		sheetService.saveWorkPlan(planning, execution, sheetId, personId, appear, workId);
+	@ResponseBody
+	public Object addWorkPlan(String[] planning, String[] execution, String sheetId, String appear, String workId) {
+		try {
+			String personId = getCurrentToken().getPersonId();
+			sheetService.saveWorkPlan(planning, execution, sheetId, personId, appear, workId);
 
+			if (StringUtils.isNotBlank(appear)) {
+				return ajax(AjaxStatus.OK, "上报成功！");
+			} else {
+				return ajax(AjaxStatus.OK, "添加成功！");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("添加失败", e);
+			return ajax(AjaxStatus.ERROR, e.getMessage());
+		}
 	}
 
+	// 获取三年内的所有年月
 	private Map<String, String> getYear() {
+		Map<String, String> map = new TreeMap<>();
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
-		DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy年MM月");
-		LocalDate date = LocalDate.now();
-		int year = date.getYear();
-		LocalDate start = LocalDate.of(year - 1, 1, 1);
+		Calendar cal = Calendar.getInstance();
+		int year = cal.get(Calendar.YEAR) - 1;
+		cal.set(year, 0, 1);
 
-		LocalDate end = LocalDate.of(year + 1, 12, 1);
-
-		Map<String, String> map = new TreeMap<String, String>();
-
-		if (!start.equals(end)) {
-			for (int i = 0; i < 36; i++) {
-				LocalDate localdate = start.plusMonths(i);
-				localdate.format(formatter);
-				map.put("", "请选择");
-				map.put(localdate.format(formatter), localdate.format(formatter1));
-			}
+		for (int i = 0; i < 36; i++, cal.add(Calendar.MONTH, 1)) {
+			Date d = cal.getTime();
+			String key = DateUtil.format(d, "yyyMM");
+			String value = DateUtil.format(d, "yyyy年MM月");
+			map.put(key, value);
 		}
-		map.put(date.format(formatter), date.format(formatter1));
+		Date date = new Date();
+		map.put(DateUtil.format(date, "yyyMM"), DateUtil.format(date, "yyyy年MM月"));
 		return map;
 	}
 
+	// 分装级别权重
 	private Map<String, String> buildWeightMap(List<KhxtLevelWeight> list) {
 
 		Map<String, String> levelMap = new HashMap<>();
-		levelMap.put("", "全部");
 		for (KhxtLevelWeight khxtlevel : list) {
-			levelMap.put(khxtlevel.getId(), khxtlevel.getName());
+			levelMap.put(khxtlevel.getId(), khxtlevel.getYear() + "年" + khxtlevel.getName());
 		}
 		return levelMap;
 	}
@@ -364,22 +575,26 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		}
 		return levelMap;
 	}
-	
+
 	@RequestMapping(value = "/listpoint")
-	public ModelAndView listPoint(Pagination pager, KhxtAppraiseSheet sheet) {
+	public ModelAndView listPoint(Pagination pager, KhxtAppraiseSheet sheet) throws Exception {
 		ModelAndView mav = getModelAndView("/khxt/appraise/listpoint");
 		LoginToken currentToken = this.getCurrentToken();
-		if(null == currentToken) {
+		if (null == currentToken) {
 			throw new RepsException("您还没有登陆！");
 		}
 		sheet.setKhrPersonId(currentToken.getPersonId());
-		ListResult<KhxtAppraiseSheet> listResult = sheetService.query(pager.getStartRow(), pager.getPageSize(), sheet, false);
+		sheet.setCheckKhr(StringUtil.isBlank(currentToken.getPersonId()) ? false : true);
+		ListResult<KhxtAppraiseSheet> listResult = sheetService.query(pager.getStartRow(), pager.getPageSize(), sheet);
 		Map<String, String> LevelMap = buildLevelMap(khxtlevelService.findAll());
-		//设置考核人
+		// 设置考核人
 		for (KhxtAppraiseSheet appraiseSheet : listResult.getList()) {
-			appraiseSheet.setCheckKhr(KhxtKhrProcessService.checkKhr(appraiseSheet.getId(), currentToken.getPersonId()));
-			appraiseSheet.setCheckCompletedMarking(KhxtKhrProcessService.checkCompletedMarking(appraiseSheet.getId(), currentToken.getPersonId()));
-			appraiseSheet.setWeightDisplay(getLevelWeightDisplay(appraiseSheet.getKhrId(), appraiseSheet.getLevelWeight().getWeight()));
+			appraiseSheet
+					.setCheckKhr(KhxtKhrProcessService.checkKhr(appraiseSheet.getId(), currentToken.getPersonId()));
+			appraiseSheet.setCheckCompletedMarking(
+					KhxtKhrProcessService.checkCompletedMarking(appraiseSheet.getId(), currentToken.getPersonId()));
+			appraiseSheet.setWeightDisplay(
+					getLevelWeightDisplay(appraiseSheet.getKhrId(), appraiseSheet.getLevelWeight().getWeight()));
 		}
 		// 考核年月
 		Map<String, String> year = getYear();
@@ -395,19 +610,19 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		mav.addObject("pager", pager);
 		return mav;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private String getLevelWeightDisplay(String levelIds, String weightJson) throws RepsException {
 		StringBuilder sblw = new StringBuilder();
-		if(StringUtil.isNotBlank(levelIds)) {
+		if (StringUtil.isNotBlank(levelIds)) {
 			String[] ids = levelIds.split(",");
 			JSONArray weightArray = JSONArray.fromObject(weightJson);
-			if(null != weightArray && !weightArray.isEmpty()) {
+			if (null != weightArray && !weightArray.isEmpty()) {
 				for (String id : ids) {
 					for (Iterator<JSONObject> iterator = weightArray.iterator(); iterator.hasNext();) {
 						JSONObject weightObj = iterator.next();
 						String levelId = weightObj.getString("levelId");
-						if(id.equals(levelId)) {
+						if (id.equals(levelId)) {
 							KhxtLevel khxtLevel = khxtlevelService.get(levelId);
 							sblw.append(khxtLevel.getName());
 							sblw.append(weightObj.getString("weight"));
@@ -420,6 +635,116 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 			}
 		}
 		return sblw.toString();
+	}
+
+	@RequestMapping(value = "/show")
+	public ModelAndView show(String sheetId, String callbackUrl) {
+		ModelAndView mav = getModelAndView("/khxt/appraise/show");
+		KhxtAppraiseSheet sheet = sheetService.get(sheetId);
+		// 处理显示时间
+		String season = sheet.getSeason();
+		sheet.setSeason(DateUtil.formatStrDateTime(season, "yyyyMM", "yyyy年MM月"));
+		String endEate = sheet.getEndEate();
+		sheet.setEndEate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
+		String beginDate = sheet.getBeginDate();
+		sheet.setBeginDate(DateUtil.formatStrDateTime(beginDate, "yyyyMMdd", "yyyy年MM月dd日"));
+		// 查询考核文件
+		List<KhxtAppraiseSheetFile> sheetFileList = fileService.findFileBySheetId(sheetId);
+		String khrLevelIds = sheet.getKhrId();
+		if (StringUtil.isNotBlank(khrLevelIds)) {
+			StringBuilder sb = new StringBuilder();
+			for (String id : khrLevelIds.split(",")) {
+				sb.append(khxtlevelService.get(id).getName());
+				sb.append(";");
+			}
+			sb.deleteCharAt(sb.toString().lastIndexOf(";"));
+			sheet.setLevelDisplay(sb.toString());
+		}
+		// 文件下载地址
+		mav.addObject("attachmentFilePath", ConfigurePath.ATTACHMENT_FILE_PATH);
+		mav.addObject("file", sheetFileList);
+		mav.addObject("sheet", sheet);
+		mav.addObject("callbackUrl", callbackUrl);
+		return mav;
+	}
+
+	@RequestMapping(value = "/assessshow")
+	public ModelAndView assessshow(String sheetId, String callbackUrl) throws Exception {
+		ModelAndView mav = show(sheetId, callbackUrl);
+		mav.setViewName("/khxt/assessdetail/assessshow");
+		KhxtAppraiseSheet sheet = (KhxtAppraiseSheet) mav.getModelMap().get("sheet");
+		// 处理权重
+		sheet.setWeight(sheetService.getJsonWeight(sheet.getLevelWeight()));
+		String khrIds = sheet.getKhrId();
+		String bkhrId = sheet.getBkhrId();
+
+		// 查询考核分组
+		List<String> list = groupService.getByLvelId(khrIds, bkhrId);
+		if (!CollectionUtils.isEmpty(list)) {
+			mav.addObject("khrpersonName", list.get(0));
+			mav.addObject("bkhrpersonName", list.get(1));
+		}
+
+		return mav;
+	}
+
+	@RequestMapping(value = "/download")
+	public void download(HttpServletResponse response, String id, String callbackUrl) throws IOException {
+		try {
+			KhxtAppraiseSheetFile fileInfo = fileService.get(id);
+			if (null == fileInfo) {
+				response.addHeader("content-type", "text/html; charset=utf-8");
+				response.setCharacterEncoding("UTF-8");
+				response.setContentType("text/html");
+				StringBuffer errorHtml = new StringBuffer(
+						"<div style='font-size:12px;width:500px;margin: 0 auto;padding-top:100px;text-align:center'");
+				errorHtml.append(">");
+				errorHtml.append("<div><font color='red'>对不起，文件已经不存在,可能已经被删除，不能提供下载</font></div>");
+				errorHtml.append("<div style='padding-top:20px'><a href='" + callbackUrl + "'>继续查看其它资源</a></div>");
+				errorHtml.append("</div>");
+				response.getWriter().write(errorHtml.toString());
+				// response.
+				return;
+			}
+
+			// String resFilePath =
+			// info.getFilePath().startsWith("/")?info.getFilePath():("/"+info.getFilePath());
+			// 本地下载
+			String path = ConfigurePath.ATTACHMENT_UPLOAD_PATH;
+			String filePath = path
+					+ (fileInfo.getFileUrl().startsWith("/") ? fileInfo.getFileUrl() : ("/" + fileInfo.getFileUrl()));
+			File file = new File(filePath);
+			response.reset();
+			if (!file.exists()) {
+				response.addHeader("content-type", "text/html; charset=utf-8");
+				response.setCharacterEncoding("UTF-8");
+				response.setContentType("text/html");
+				StringBuffer errorHtml = new StringBuffer(
+						"<div style='font-size:12px;width:500px;margin: 0 auto;padding-top:100px;text-align:center'");
+				errorHtml.append(">");
+				errorHtml.append("<div><font color='red'>对不起，文件已经不存在,可能已经被删除，不能提供下载</font></div>");
+				errorHtml.append("<div style='padding-top:20px'><a href='" + callbackUrl + "'>继续查看其它资源</a></div>");
+				errorHtml.append("</div>");
+				response.getWriter().write(errorHtml.toString());
+				// response.
+				return;
+			}
+
+			InputStream inStream = new FileInputStream(filePath);// 文件的存放路径
+
+			response.addHeader("Content-Disposition", "attachment;filename=\"" + new String(
+					(fileInfo.getFileName() + "." + fileInfo.getFileType()).getBytes("GB2312"), "ISO_8859_1") + "\"");
+			// 循环取出流中的数据
+			byte[] b = new byte[inStream.available()];
+			int len;
+			while ((len = inStream.read(b)) > 0) {
+				response.getOutputStream().write(b, 0, len);
+			}
+			inStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("下载id=" + id + "的资源文件出错");
+		}
 	}
 
 }

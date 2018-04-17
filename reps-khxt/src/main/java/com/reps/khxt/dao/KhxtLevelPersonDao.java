@@ -4,6 +4,7 @@ import static com.reps.khxt.util.SqlUtil.formatSql;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -157,7 +158,9 @@ public class KhxtLevelPersonDao {
 	public KhxtLevelPerson getByPersonId(String id) {
 
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtLevelPerson.class, "p");
-
+		if (StringUtils.isBlank(id)) {
+			return null;
+		}
 		dc.add(Restrictions.eq("p.personId", id));
 		List<KhxtLevelPerson> list = dao.findByCriteria(dc);
 		if (CollectionUtils.isEmpty(list)) {

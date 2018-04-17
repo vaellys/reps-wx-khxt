@@ -61,6 +61,7 @@ public class KhxtAppraiseSheet extends IdEntity implements Serializable {
 	@Column(name = "khr_level_ids", length = 500)
 	private String khrId;
 
+
 	/** 被考核人级别ID */
 	@Column(name = "bkhr_level_id", length = 32, insertable = false, updatable = false)
 	private String bkhrId;
@@ -90,54 +91,62 @@ public class KhxtAppraiseSheet extends IdEntity implements Serializable {
 	/** 添加人用户ID */
 	@Column(name = "add_user_id", length = 32)
 	private String userId;
-	
+
 	/** 是否是考核人 */
 	@JsonIgnore
 	@Transient
 	private boolean checkKhr;
-	
+
 	/**
 	 * 是否已完成打分
 	 */
 	@JsonIgnore
 	@Transient
 	private boolean checkCompletedMarking;
-	
+
 	@Transient
 	@JsonIgnore
 	private String weightDisplay;
 
 	/** 考核进度 0：未完成 1：已完成 2：已结束 */
 	@Column(name = "progress", length = 32)
-	private Integer progress;
+	private Short progress;
 
 	/**
 	 * 进度情况
 	 */
-	@Column(name = "result", length = 100)
+	@Column(name = "result", length = 500)
 	private String result;
 
 	@JsonIgnore
-	@ManyToMany(cascade = { CascadeType.PERSIST }, fetch = FetchType.LAZY)
+	@ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
 	@JoinTable(name = "reps_khxt_performance_item", joinColumns = {
 			@JoinColumn(name = "performance_id") }, inverseJoinColumns = { @JoinColumn(name = "item_id") })
 	private Set<KhxtItem> item;
-	
-	
+
 	@JsonIgnore
-	@OneToMany(cascade = {}, fetch=FetchType.LAZY)
+	@OneToMany(cascade = {}, fetch = FetchType.LAZY)
 	@JoinColumn(name = "sheet_id")
 	private List<KhxtKhrProcess> khrProcessList;
-	
+
 	/** 查询时用 */
 	@Transient
 	@JsonIgnore
 	private String khrPersonId;
-	
+
 	/** 查询打分状态 */
 	@Transient
 	@JsonIgnore
 	private Integer status;
+
+	/** 考核人级别显示 */
+	@Transient
+	@JsonIgnore
+	private String levelDisplay;
+	/** 考核人级别名称 */
+	@Transient
+	@JsonIgnore
+	private String khrName;
 
 	public String getName() {
 		return name;
@@ -251,11 +260,11 @@ public class KhxtAppraiseSheet extends IdEntity implements Serializable {
 		this.endEate = endEate;
 	}
 
-	public Integer getProgress() {
+	public Short getProgress() {
 		return progress;
 	}
 
-	public void setProgress(Integer progress) {
+	public void setProgress(Short progress) {
 		this.progress = progress;
 	}
 
@@ -266,7 +275,6 @@ public class KhxtAppraiseSheet extends IdEntity implements Serializable {
 	public void setResult(String result) {
 		this.result = result;
 	}
-
 
 	public boolean isCheckKhr() {
 		return checkKhr;
@@ -316,4 +324,20 @@ public class KhxtAppraiseSheet extends IdEntity implements Serializable {
 		this.status = status;
 	}
 
+	public String getLevelDisplay() {
+		return levelDisplay;
+	}
+
+	public void setLevelDisplay(String levelDisplay) {
+		this.levelDisplay = levelDisplay;
+	}
+
+	public String getKhrName() {
+		return khrName;
+	}
+
+	public void setKhrName(String khrName) {
+		this.khrName = khrName;
+	}
+	
 }

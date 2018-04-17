@@ -17,9 +17,10 @@ public interface IKhxtCategoryService {
 	/**
 	 * 添加指标类别
 	 * @param khxtCategory
+	 * @return 
 	 * @throws RepsException
 	 */
-	public void save(KhxtCategory khxtCategory) throws RepsException;
+	public boolean save(KhxtCategory khxtCategory) throws RepsException;
 	
 	/**
 	 * 删除指标类别

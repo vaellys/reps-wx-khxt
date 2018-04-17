@@ -79,8 +79,9 @@ public interface IKhxtGroupService {
 	 * @param khrid
 	 * @return
 	 * @return KhxtGroup
+	 * @throws Exception 
 	 */
-	List<KhxtGroup> getByLvelId(String khrid);
+	List<String> getByLvelId(String khrid, String bkhrid) throws Exception;
 
 	/**
 	 * 检查级别是否存在

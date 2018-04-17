@@ -40,4 +40,8 @@ public class KhxtAppraiseSheetFileDao {
 
 		dao.delete(appraiseSheetFile);
 	}
+	
+	public KhxtAppraiseSheetFile get(String id) {
+		return dao.get(KhxtAppraiseSheetFile.class, id);
+	}
 }

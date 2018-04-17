@@ -68,7 +68,7 @@
 					<%-- <reps:gridfield title="用户身份" width="15">
 						<sys:dictionary src="user_identity">${u.userIdentity}</sys:dictionary>
 					</reps:gridfield> --%>
-					<reps:gridfield title="选择" width="10" align="center">
+					<reps:gridfield title="选择" width="10" align="center" >
 					<c:if test="${'00' == u.userIdentity}">
 						<input type="checkbox" disabled="disabled"/>
 					</c:if>
@@ -143,6 +143,7 @@
 					$("span[id^=show]:last").append(", ");
 					$("#selecteUser").append("<span id='show"+id+"'nameAttr='"+nameAttr+"'idAttr='"+id+"' >"+nameAttr+"</span>");
 				}else{
+					$("span[id^=show]:last").append(", ");
 					$("#selecteUser").append("<span id='show"+id+"'nameAttr='"+nameAttr+"'idAttr='"+id+"' >"+nameAttr+"</span>");
 				}
 			}else{

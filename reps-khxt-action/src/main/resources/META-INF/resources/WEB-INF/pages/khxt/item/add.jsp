@@ -11,7 +11,7 @@
 	<reps:panel id="myform" dock="center" action="add.mvc" formId="xform" validForm="true"  >
 		<reps:formcontent style="margin-left:250px;">
 			<reps:formfield label="所属类别" fullRow="true">
-				<reps:select dataSource="${categoryMap}" id="categoryId" name="khxtCategory.id" required="true" style="width:304px"></reps:select>
+				<reps:select dataSource="${categoryMap}" headerValue="" headerText="" id="categoryId" name="khxtCategory.id" required="true" style="width:304px"></reps:select>
 			</reps:formfield>
 			<reps:formfield label="指标名称" fullRow="true">
 				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:300px"></reps:input>

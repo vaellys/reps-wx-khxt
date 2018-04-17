@@ -21,31 +21,32 @@ import com.reps.khxt.service.IKhxtItemService;
 @Service
 @Transactional
 public class KhxtItemServiceImpl implements IKhxtItemService {
-	
+
 	protected final Logger logger = LoggerFactory.getLogger(KhxtItemServiceImpl.class);
-	
+
 	@Autowired
 	KhxtItemDao dao;
 
 	@Override
-	public void save(KhxtItem khxtItem) throws RepsException {
-		if(null == khxtItem) {
+	public boolean save(KhxtItem khxtItem) throws RepsException {
+		if (null == khxtItem) {
 			throw new RepsException("数据异常");
 		}
-		if(!this.checkItemNameExists(khxtItem)) {
+		if (!this.checkItemNameExists(khxtItem)) {
 			dao.save(khxtItem);
+			return true;
 		} else {
-			throw new RepsException("指标名称已存在，请重新输入");
+			return false;
 		}
 	}
 
 	@Override
 	public void delete(KhxtItem khxtItem) throws RepsException {
-		if(null == khxtItem) {
+		if (null == khxtItem) {
 			throw new RepsException("参数异常");
 		}
 		KhxtItem item = this.get(khxtItem.getId(), true);
-		if(null != item.getSheets() && !item.getSheets().isEmpty()) {
+		if (null != item.getSheets() && !item.getSheets().isEmpty()) {
 			throw new RepsException("该指标被引用");
 		} else {
 			dao.delete(item);
@@ -54,20 +55,20 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 
 	@Override
 	public void update(KhxtItem khxtItem) throws RepsException {
-		if(null == khxtItem) {
+		if (null == khxtItem) {
 			throw new RepsException("参数异常");
 		}
 		KhxtItem item = dao.get(khxtItem.getId());
 		String name = khxtItem.getName();
-		if(StringUtil.isNotBlank(name)) {
+		if (StringUtil.isNotBlank(name)) {
 			item.setName(name);
 		}
 		Double point = khxtItem.getPoint();
-		if(null != point) {
+		if (null != point) {
 			item.setPoint(point);
 		}
 		KhxtCategory khxtCategory = khxtItem.getKhxtCategory();
-		if(null != khxtCategory) {
+		if (null != khxtCategory) {
 			item.setKhxtCategory(khxtCategory);
 		}
 		dao.update(item);
@@ -75,14 +76,14 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 
 	@Override
 	public KhxtItem get(String id, boolean eager) throws RepsException {
-		if(StringUtil.isBlank(id)) {
+		if (StringUtil.isBlank(id)) {
 			throw new RepsException("参数异常:类别ID不能为空");
 		}
 		KhxtItem khxtItem = dao.get(id);
-		if(null == khxtItem) {
+		if (null == khxtItem) {
 			throw new RepsException("参数异常:类别ID无效");
 		}
-		if(eager) {
+		if (eager) {
 			Hibernate.initialize(khxtItem.getSheets());
 		}
 		return khxtItem;
@@ -95,34 +96,34 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 
 	@Override
 	public boolean checkItemExistInCategory(String cid) throws RepsException {
-		if(StringUtil.isBlank(cid)) {
+		if (StringUtil.isBlank(cid)) {
 			throw new RepsException("参数异常:请指定类别ID");
 		}
 		KhxtItem item = new KhxtItem();
 		item.setCategoryId(cid);
 		List<KhxtItem> itemList = dao.find(item);
-		if(null == itemList || itemList.isEmpty()) {
+		if (null == itemList || itemList.isEmpty()) {
 			return false;
 		} else {
 			return true;
 		}
 	}
-	
+
 	@Override
 	public boolean checkItemNameExists(KhxtItem khxtItem) throws RepsException {
 		String name = khxtItem.getName();
-		if(StringUtil.isNotBlank(name)) {
+		if (StringUtil.isNotBlank(name)) {
 			List<KhxtItem> list = dao.find(khxtItem);
-			if(null != list && !list.isEmpty()) {
+			if (null != list && !list.isEmpty()) {
 				return true;
 			}
-		} 
+		}
 		return false;
 	}
 
 	@Override
 	public List<KhxtItem> findAll() {
-		
+
 		return dao.find(null);
 	}
 

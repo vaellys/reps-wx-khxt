@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reps.core.orm.IdEntity;
@@ -28,51 +29,63 @@ import com.reps.system.entity.Person;
 public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 
 	private static final long serialVersionUID = -4949689189823390197L;
-	
+
 	/** 考核表ID */
 	@Column(name = "sheet_id", nullable = false, length = 32, insertable = false, updatable = false)
 	private String sheetId;
 
 	/** 考核表 */
 	@JsonIgnore
-    @ManyToOne(cascade = {})
-    @JoinColumn(name = "sheet_id")
-    private KhxtAppraiseSheet appraiseSheet;
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "sheet_id")
+	private KhxtAppraiseSheet appraiseSheet;
 
 	/** 考核人ID */
 	@Column(name = "khr_person_id", length = 32, nullable = false, insertable = false, updatable = false)
 	private String khrPersonId;
-	
+
 	@JsonIgnore
-    @ManyToOne(cascade = {})
-    @JoinColumn(name = "khr_person_id")
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "khr_person_id")
 	private Person khrPerson;
-	
+
 	/** 被考核人ID */
 	@Column(name = "bkhr_person_id", length = 32, nullable = false, insertable = false, updatable = false)
 	private String bkhrPersonId;
-	
+
 	@JsonIgnore
-    @ManyToOne(cascade = {})
-    @JoinColumn(name = "bkhr_person_id")
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "bkhr_person_id")
 	private Person bkhrPerson;
 
 	/** 评定总分 */
 	@Column(name = "total_points")
 	private Double totalPoints;
-	
+
 	/** 评定时间 */
 	@Column(name = "appraise_time")
 	private Date appraiseTime;
-	
-	/** 评定状态 */
+
+	/** 评定状态 0:未上报-1：已上报-2：已打分 */
 	@Column(name = "status")
 	private Short status;
-	
+
 	@JsonIgnore
-	@OneToMany(cascade = {}, fetch=FetchType.LAZY)
+	@OneToMany(cascade = {}, fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private List<KhxtPerformancePoint> performancePoints;
+
+	@JsonIgnore
+	@Transient
+	private String personOrganize;
+
+	public String getPersonOrganize() {
+		return personOrganize;
+	}
+
+	public void setPersonOrganize(String personOrganize) {
+		this.personOrganize = personOrganize;
+	}
 
 	public String getSheetId() {
 		return sheetId;
@@ -153,7 +166,5 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 	public void setPerformancePoints(List<KhxtPerformancePoint> performancePoints) {
 		this.performancePoints = performancePoints;
 	}
-	
-	
+
 }
-	

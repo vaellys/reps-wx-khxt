@@ -61,8 +61,12 @@ public class KhxtCategoryAction extends BaseAction {
 	@ResponseBody
 	public Object add(KhxtCategory khxtCategory) {
 		try {
-			khxtCategoryService.save(khxtCategory);
-			return ajax(AjaxStatus.OK, "添加成功");
+			boolean save = khxtCategoryService.save(khxtCategory);
+			if(save){
+				return ajax(AjaxStatus.OK, "添加成功");
+			}else{
+				return ajax(AjaxStatus.ERROR, "类别名称已存在，请重新输入!");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("添加失败", e);

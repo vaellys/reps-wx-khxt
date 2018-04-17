@@ -1,6 +1,6 @@
 package com.reps.khxt.action;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,8 +65,8 @@ public class KhxtItemAction extends BaseAction {
 	}
 
 	private Map<String, String> buildCategoryMap(List<KhxtCategory> categoryList) {
-		Map<String, String> categoryMap = new HashMap<>();
-		categoryMap.put("", "全部");
+		Map<String, String> categoryMap = new LinkedHashMap<>();
+		categoryMap.put("", "");
 		for (KhxtCategory khxtCategory : categoryList) {
 			categoryMap.put(khxtCategory.getId(), khxtCategory.getName());
 		}
@@ -77,8 +77,12 @@ public class KhxtItemAction extends BaseAction {
 	@ResponseBody
 	public Object add(KhxtItem khxtItem) {
 		try {
-			khxtItemService.save(khxtItem);
-			return ajax(AjaxStatus.OK, "添加成功");
+			boolean save = khxtItemService.save(khxtItem);
+			if(save){
+				return ajax(AjaxStatus.OK, "添加成功");
+			}else{
+				return ajax(AjaxStatus.ERROR, "指标名称已存在，请重新输入！");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("添加失败", e);

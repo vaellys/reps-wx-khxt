@@ -22,7 +22,7 @@ public class KhxtAppraiseSheetFileServiceImpl implements IKhxtAppraiseSheetFileS
 	private KhxtAppraiseSheetFileDao dao;
 
 	@Override
-	public KhxtAppraiseSheetFile findFileBySheetId(String sheetId) {
+	public List<KhxtAppraiseSheetFile> findFileBySheetId(String sheetId) {
 		if (StringUtils.isBlank(sheetId)) {
 			throw new RepsException("考核表ID不能为空！");
 		}
@@ -30,7 +30,12 @@ public class KhxtAppraiseSheetFileServiceImpl implements IKhxtAppraiseSheetFileS
 		if (CollectionUtils.isEmpty(list)) {
 			return null;
 		}
-		return list.get(0);
+		return list;
+	}
+
+	@Override
+	public KhxtAppraiseSheetFile get(String id) throws RepsException {
+		return dao.get(id);
 	}
 
 }

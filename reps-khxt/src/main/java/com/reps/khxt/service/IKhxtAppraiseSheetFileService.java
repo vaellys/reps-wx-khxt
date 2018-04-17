@@ -1,5 +1,8 @@
 package com.reps.khxt.service;
 
+import java.util.List;
+
+import com.reps.core.exception.RepsException;
 import com.reps.khxt.entity.KhxtAppraiseSheetFile;
 
 public interface IKhxtAppraiseSheetFileService {
@@ -13,6 +16,8 @@ public interface IKhxtAppraiseSheetFileService {
 	 * @return
 	 * @return KhxtAppraiseSheetFile
 	 */
-	KhxtAppraiseSheetFile findFileBySheetId(String sheetId);
+	List<KhxtAppraiseSheetFile> findFileBySheetId(String sheetId);
+	
+	public KhxtAppraiseSheetFile get(String id) throws RepsException;
 
 }

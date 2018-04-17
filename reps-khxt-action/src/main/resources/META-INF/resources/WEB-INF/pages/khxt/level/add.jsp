@@ -14,10 +14,10 @@
 				<reps:input name="name" minLength="2" maxLength="20" required="true" style="width:300px"></reps:input>
 			</reps:formfield>
 			<reps:formfield label="级别" fullRow="true">
-				<reps:select jsonData="{'':'请选择','1':'一级','2':'二级','3':'三级','4':'四级','5':'五级','6':'六级'}" name="level" required="true" style="width:304px"></reps:select>
+				<reps:select jsonData="{'':'','1':'一级','2':'二级','3':'三级','4':'四级','5':'五级','6':'六级'}" name="level" required="true" style="width:304px"></reps:select>
 			</reps:formfield>
 			<reps:formfield label="级别权限" fullRow="true">
-				<reps:select jsonData="{'':'请选择','1':'是考核人','2':'是被考核人','3':'是考核人，也是被考核人'}" name="power" required="true" style="width:304px"></reps:select>
+				<reps:select jsonData="{'':'','1':'是考核人','2':'是被考核人','3':'是考核人，也是被考核人'}" name="power" required="true" style="width:304px"></reps:select>
 			</reps:formfield>
 		</reps:formcontent>
 		</br></br>

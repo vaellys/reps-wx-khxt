@@ -30,7 +30,7 @@
 </head>
 <body>
 	<reps:container layout="true">
-		<reps:panel id="top" dock="top" method="post" action="bkhrList.mvc?levelId=${levelId }" formId="queryForm">
+		<reps:panel id="top" dock="top" method="post" action="bkhrlistlevel.mvc?levelId=${levelId }" formId="queryForm">
 			<reps:formcontent parentLayout="true" style="width:80%;">
 				<input name="roleId" type="hidden" value="${roleId}" />
 				<input name="showName" type="hidden" value="${showName}" />
@@ -38,7 +38,7 @@
 				<input name="multiple" type="hidden" value="${multiple}" />
 				<input name="hideNameValue" type="hidden" value="${hideNameValue}" />
 				<input name="dialogId" type="hidden" value="${dialogId}" />
-				
+				<input name="hiddenlevelId" id="hiddenlevelId" type="hidden" value="${u.levelId}" /> 
 				<reps:formfield label="姓名">
 					<reps:input name="personName">${u.personName}</reps:input>
 				</reps:formfield>
@@ -249,7 +249,14 @@
 		//关闭弹出框
 		$.pdialog.pdialogClose();
 	};
-
+	$(function () {
+ 		<c:forEach  items="${list}" var="u">
+ 			<c:if test="${!empty u}">  
+				var a ="${u.levelId}";
+				$("#hiddenlevelId").val(a);
+         	</c:if>
+     </c:forEach>
+ 	});
 </script>
 </body>
 </html>

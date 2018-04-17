@@ -18,9 +18,10 @@ public interface IKhxtItemService {
 	/**
 	 * 添加指标
 	 * @param khxtItem
+	 * @return 
 	 * @throws RepsException
 	 */
-	public void save(KhxtItem khxtItem) throws RepsException;
+	public boolean save(KhxtItem khxtItem) throws RepsException;
 	
 	/**
 	 * 删除指标

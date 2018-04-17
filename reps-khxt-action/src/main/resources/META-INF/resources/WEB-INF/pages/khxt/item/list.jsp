@@ -8,13 +8,13 @@
 </head>
 <body>
 <reps:container layout="true">
-	<reps:panel title="" id="top" dock="top" method="post" action="list.mvc" formId="queryForm">
+	<reps:panel  id="top" dock="top" method="post" action="list.mvc" formId="queryForm">
 		<reps:formcontent parentLayout="true" style="width:80%;">
 			<reps:formfield label="名称" labelStyle="width:20%;" textStyle="width:27%;">
 				<reps:input name="name" maxLength="20">${item.name }</reps:input>
 			</reps:formfield>
 			<reps:formfield label="所属类别" labelStyle="width:23%;" textStyle="width:30%;">
-				<reps:select dataSource="${categoryMap}" name="categoryId" >${item.categoryId }</reps:select>
+				<reps:select dataSource="${categoryMap}" name="categoryId" headerText="" headerValue="">${item.categoryId }</reps:select>
 			</reps:formfield>
 		</reps:formcontent>
 		<reps:querybuttons>

@@ -8,7 +8,7 @@
 </head>
 <body>
 <reps:container layout="true">
-	<reps:panel title="" id="top" dock="top" method="post" action="list.mvc" formId="queryForm">
+	<reps:panel  id="top" dock="top" method="post" action="list.mvc" formId="queryForm">
 		
 		<reps:footbar>
 			<reps:button cssClass="add-a" action="toadd.mvc" messageCode="manage.action.add" value="新增"></reps:button>

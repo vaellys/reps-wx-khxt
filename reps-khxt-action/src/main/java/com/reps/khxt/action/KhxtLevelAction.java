@@ -1,9 +1,10 @@
 package com.reps.khxt.action;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +70,8 @@ public class KhxtLevelAction extends BaseAction {
 	}
 
 	private Map<String, String> buildCategoryMap(List<KhxtCategory> categoryList) {
-		Map<String, String> categoryMap = new HashMap<>();
-		categoryMap.put("", "全部");
+		Map<String, String> categoryMap = new LinkedHashMap<>();
+		categoryMap.put("", "");
 		for (KhxtCategory khxtCategory : categoryList) {
 			categoryMap.put(khxtCategory.getId(), khxtCategory.getName());
 		}
@@ -132,6 +133,11 @@ public class KhxtLevelAction extends BaseAction {
 		try {
 			ModelAndView mav = new ModelAndView("/khxt/level/show");
 			KhxtLevel khxtLevel = khxtLevelService.get(id);
+			//根据级别查询人员
+			if(khxtLevel!=null&&StringUtils.isNotBlank(khxtLevel.getId())){
+				String personName = khxtLevelPersonService.joinLevelPersonName(khxtLevel.getId());
+				khxtLevel.setPersonNames(personName);
+			}
 			mav.addObject("level", khxtLevel);
 			return mav;
 		} catch (Exception e) {

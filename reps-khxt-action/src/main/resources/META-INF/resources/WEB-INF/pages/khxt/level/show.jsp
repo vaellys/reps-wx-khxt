@@ -27,6 +27,9 @@
 					<c:if test="${level.power == '2'}">是被考核人</c:if>
 					<c:if test="${level.power == '3'}">是考核人，也是被考核人</c:if>
 				</reps:detailfield>
+				<reps:detailfield label="级別人员" fullRow="true" labelStyle="width:20%;">
+					${level.personNames}
+				</reps:detailfield>
 			</reps:detail>
 			<reps:formbar>
 				<reps:button cssClass="btn_back" type="button" onClick="back()"

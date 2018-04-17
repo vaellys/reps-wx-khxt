@@ -3,6 +3,8 @@ package com.reps.khxt.action;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
 import com.reps.core.RepsConstant;
 import com.reps.core.commons.Pagination;
 import com.reps.core.orm.ListResult;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
-import com.reps.khxt.entity.KhxtCategory;
 import com.reps.khxt.entity.KhxtGroup;
 import com.reps.khxt.entity.KhxtLevel;
 import com.reps.khxt.entity.KhxtLevelPerson;
@@ -64,9 +66,19 @@ public class KhxtGroupAction extends BaseAction {
 	@RequestMapping(value = "/toadd")
 	public Object toAdd() {
 		ModelAndView mav = getModelAndView("/khxt/group/add");
-		Map<String, String> LevelMap = buildLevelMap(khxtlevelService.listKhxtLevel());
+
+		// 查询考核人
+		Short[] b = { 1, 3 };
+		List<KhxtLevel> khr = khxtlevelService.findByPower(b);
+		// 查询被考核人
+		Short[] k = { 2, 3 };
+		List<KhxtLevel> bkhr = khxtlevelService.findByPower(k);
+
+		Map<String, String> khrLevelMap = buildLevelMap(khr);
+		Map<String, String> bkhrLevelMap = buildLevelMap(bkhr);
 		try {
-			mav.addObject("LevelMap", LevelMap);
+			mav.addObject("khrLevelMap", khrLevelMap);
+			mav.addObject("bkhrLevelMap", bkhrLevelMap);
 			return mav;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -117,7 +129,7 @@ public class KhxtGroupAction extends BaseAction {
 	@ResponseBody
 	public Object edit(KhxtGroup group, String khrIds, String bkhrIds) {
 		try {
-			kxhtGroupService.update(group,khrIds,bkhrIds);
+			kxhtGroupService.update(group, khrIds, bkhrIds);
 			return ajax(AjaxStatus.OK, "修改成功");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -141,7 +153,6 @@ public class KhxtGroupAction extends BaseAction {
 
 	private Map<String, String> buildLevelMap(List<KhxtLevel> levelList) {
 		Map<String, String> levelMap = new HashMap<>();
-		levelMap.put("", "全部");
 		for (KhxtLevel khxtlevel : levelList) {
 			levelMap.put(khxtlevel.getId(), khxtlevel.getName());
 		}
@@ -150,18 +161,25 @@ public class KhxtGroupAction extends BaseAction {
 
 	@RequestMapping(value = "/khrlistlevel")
 	public ModelAndView khrList(User user, String dialogId, String showName, String hideName, String hideNameValue,
-			String callBack, KhxtLevelPerson khxtLevelPerson) {
+			String callBack, KhxtLevelPerson khxtLevelPerson, String hiddenlevelId) {
 		ModelAndView mav = getModelAndView("/khxt/group/khrperson");
+		khxtLevelPerson.setLevelId(hideNameValue);
+		if (StringUtils.isBlank(khxtLevelPerson.getLevelId())) {
+			khxtLevelPerson.setLevelId(hiddenlevelId);
+		}
+		if(StringUtils.isBlank(khxtLevelPerson.getLevelId())){
+			return mav;
+		}
 		List<KhxtLevelPerson> listResult = khxtlevelPersonService.findLevelPerson(khxtLevelPerson);
 		// 分页数据
 		mav.addObject("list", listResult);
 
 		mav.addObject("user", user);
-		mav.addObject("levelId", khxtLevelPerson.getLevelId());
+		mav.addObject("levelId", hideNameValue);
 		mav.addObject("dialogId", dialogId);
 		mav.addObject("showName", showName);
 		mav.addObject("hideName", hideName);
-		mav.addObject("hideNameValue", hideNameValue);
+		mav.addObject("hideNameValue", "");
 		mav.addObject("callBack", callBack);
 		mav.addObject("admins", RepsConstant.getAdmins());
 
@@ -170,18 +188,25 @@ public class KhxtGroupAction extends BaseAction {
 
 	@RequestMapping(value = "/bkhrlistlevel")
 	public ModelAndView bkhrList(User user, String dialogId, String showName, String hideName, String hideNameValue,
-			String callBack, KhxtLevelPerson khxtLevelPerson) {
+			String callBack, KhxtLevelPerson khxtLevelPerson, String hiddenlevelId) {
 		ModelAndView mav = getModelAndView("/khxt/group/bkhrperson");
+		khxtLevelPerson.setLevelId(hideNameValue);
+		if (StringUtils.isBlank(khxtLevelPerson.getLevelId())) {
+			khxtLevelPerson.setLevelId(hiddenlevelId);
+		}
+		if(StringUtils.isBlank(khxtLevelPerson.getLevelId())){
+			return mav;
+		}
 		List<KhxtLevelPerson> listResult = khxtlevelPersonService.findLevelPerson(khxtLevelPerson);
 		// 分页数据
 		mav.addObject("list", listResult);
 
 		mav.addObject("user", user);
-		mav.addObject("levelId", khxtLevelPerson.getLevelId());
+		mav.addObject("levelId", hideNameValue);
 		mav.addObject("dialogId", dialogId);
 		mav.addObject("showName", showName);
 		mav.addObject("hideName", hideName);
-		mav.addObject("hideNameValue", hideNameValue);
+		mav.addObject("hideNameValue", "");
 		mav.addObject("callBack", callBack);
 		mav.addObject("admins", RepsConstant.getAdmins());
 
