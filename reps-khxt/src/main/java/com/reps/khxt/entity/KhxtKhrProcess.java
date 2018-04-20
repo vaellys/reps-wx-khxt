@@ -8,8 +8,11 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reps.core.orm.IdEntity;
+import com.reps.system.entity.Person;
 
 /**
  * 考核人打分表
@@ -26,9 +29,14 @@ public class KhxtKhrProcess extends IdEntity implements Serializable {
 	 */
 	private static final long serialVersionUID = -7242874814747880345L;
 
-	/** 被考核人personId */
-	@Column(name = "khr_person_id", length = 32)
+	/** 考核人personId */
+	@Column(name = "khr_person_id", nullable = false, length = 32, insertable = false, updatable = false)
 	private String khrPersonId;
+	
+	@JsonIgnore
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "khr_person_id")
+	private Person khrPerson;
 
 	/** 考核表ID */
 	@Column(name = "sheet_id", nullable = false, length = 32, insertable = false, updatable = false)
@@ -37,23 +45,35 @@ public class KhxtKhrProcess extends IdEntity implements Serializable {
 	/**
 	 * 考核表ID
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
 	@JoinColumn(name = "sheet_id")
-	private KhxtAppraiseSheet AppraiseSheet;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private KhxtAppraiseSheet appraiseSheet;
 
 	/**
 	 * 打分情况 0：未完成打分 1：已完成打分
 	 */
 	@Column(name = "status")
 	private Integer status;
-
-
+	
+	@JsonIgnore
+	@Transient
+	private String organizeName;
+	
+	@JsonIgnore
+	@Transient
+	private String beginDate;
+	
+	@JsonIgnore
+	@Transient
+	private String endDate;
+	
 	public KhxtAppraiseSheet getAppraiseSheet() {
-		return AppraiseSheet;
+		return appraiseSheet;
 	}
 
 	public void setAppraiseSheet(KhxtAppraiseSheet appraiseSheet) {
-		AppraiseSheet = appraiseSheet;
+		this.appraiseSheet = appraiseSheet;
 	}
 
 	public Integer getStatus() {
@@ -80,4 +100,36 @@ public class KhxtKhrProcess extends IdEntity implements Serializable {
 		this.sheetId = sheetId;
 	}
 
+	public Person getKhrPerson() {
+		return khrPerson;
+	}
+
+	public void setKhrPerson(Person khrPerson) {
+		this.khrPerson = khrPerson;
+	}
+
+	public String getOrganizeName() {
+		return organizeName;
+	}
+
+	public void setOrganizeName(String organizeName) {
+		this.organizeName = organizeName;
+	}
+
+	public String getBeginDate() {
+		return beginDate;
+	}
+
+	public void setBeginDate(String beginDate) {
+		this.beginDate = beginDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+	
 }

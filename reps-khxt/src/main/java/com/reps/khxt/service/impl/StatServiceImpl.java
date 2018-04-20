@@ -3,6 +3,7 @@ package com.reps.khxt.service.impl;
 import static java.util.stream.Collectors.groupingBy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,8 +18,6 @@ import org.springframework.stereotype.Service;
 
 import com.reps.core.exception.RepsException;
 import com.reps.core.util.StringUtil;
-import com.reps.khxt.entity.CellMergeRange;
-import com.reps.khxt.entity.ItemWeight;
 import com.reps.khxt.entity.KhxtAppraiseSheet;
 import com.reps.khxt.entity.KhxtItem;
 import com.reps.khxt.entity.KhxtLevelPerson;
@@ -29,6 +28,8 @@ import com.reps.khxt.service.IKhxtLevelPersonService;
 import com.reps.khxt.service.IKhxtPerformanceMembersService;
 import com.reps.khxt.service.IStatService;
 import com.reps.khxt.util.WeightUtil;
+import com.reps.khxt.vo.CellMergeRange;
+import com.reps.khxt.vo.ItemWeight;
 
 @Service
 @Transactional
@@ -44,23 +45,29 @@ public class StatServiceImpl implements IStatService {
 	IKhxtLevelPersonService khxtLevelPersonService;
 
 	@Override
-	public List<Map<String, Object>> computeAssessItem(String sheetId) throws RepsException {
+	public List<Map<String, Object>> computeAssessItem(KhxtPerformanceMembers performanceMember) throws RepsException {
 		List<Map<String, Object>> resultList = null;
+		String sheetId = performanceMember.getSheetId();
 		if (StringUtil.isNotBlank(sheetId)) {
 			// 查询特定考核表的人员名单
 			KhxtPerformanceMembers khxtPerformanceMembers = new KhxtPerformanceMembers();
 			khxtPerformanceMembers.setSheetId(sheetId);
+			khxtPerformanceMembers.setKhrPersonName(performanceMember.getKhrPersonName());
+			khxtPerformanceMembers.setBkhrPersonName(performanceMember.getBkhrPersonName());
 			// 按被考核人分组查询
 			List<String> bkhrPersonIds = khxtPerformanceMembersService.findByGroup(khxtPerformanceMembers);
 			if (null != bkhrPersonIds && !bkhrPersonIds.isEmpty()) {
 				resultList = new ArrayList<>();
 				for (int i = 0; i < bkhrPersonIds.size() ; i++) {
 					// 查询该考核表的被考核人的所有考核人
-					khxtPerformanceMembers.setBkhrPersonId(bkhrPersonIds.get(i));
+					String id = bkhrPersonIds.get(i);
+					khxtPerformanceMembers.setBkhrPersonId(id);
 					List<KhxtPerformanceMembers> memberList = khxtPerformanceMembersService.find(khxtPerformanceMembers, true);
 					if (null != memberList && !memberList.isEmpty()) {
 						//存储每个按被考核人分组的信息
 						Map<String, Object> resultMap = new HashMap<>();
+						resultMap.put("sheetId", sheetId);
+						resultMap.put("bkhrPersonId", id);
 						resultMap.put("bkhrPersonName", memberList.get(0).getBkhrPerson().getName());
 						// 存储考核指标信息
 						List<Map<String, Object>> itemList = new ArrayList<>();
@@ -83,44 +90,8 @@ public class StatServiceImpl implements IStatService {
 						}
 						resultMap.put("itemList", itemList);
 						
+						List<ItemWeight> itemWeightList = computeScorePerItem(list);
 						double sum = 0.0;
-						//存储每种指标的权重计算之后
-						List<ItemWeight> itemWeightList = new ArrayList<>();
-						//对按被考核人进行分组之后 的每组 按指标进行分组
-						Map<String, List<KhxtPerformancePoint>> pointMap = list.stream().collect(groupingBy(KhxtPerformancePoint::getItemId));
-						for (Map.Entry<String, List<KhxtPerformancePoint>> entry : pointMap.entrySet()) {
-							//按人员级别对人员评分进行分组
-							Map<String, List<KhxtPerformancePoint>> levelPointMap = new HashMap<>();
-							List<KhxtPerformancePoint> targetList = null;
-							for (KhxtPerformancePoint p : entry.getValue()) {
-								KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(p.getKhxtPerformanceMembers().getKhrPerson().getId());
-								String levelId = levelPerson.getLevelId();
-								if(levelPointMap.containsKey(levelId)) {
-									levelPointMap.get(levelId).add(p);
-								} else {
-									targetList = new ArrayList<>();
-									targetList.add(p);
-									levelPointMap.put(levelId, targetList);
-								}
-							}
-							//对得分进行计算
-							List<Double> sumList = new ArrayList<>();
-							for (Map.Entry<String, List<KhxtPerformancePoint>> lpm : levelPointMap.entrySet()) {
-								String levelId = lpm.getKey();
-								Double tempSum = 0.0;
-								for (KhxtPerformancePoint pp : lpm.getValue()) {
-									Double point = pp.getPoint();
-									Double weight = Double.valueOf(WeightUtil.findWeightByLevelId(levelId, pp.getKhxtPerformanceMembers().getAppraiseSheet().getLevelWeight().getWeight()));
-									tempSum += weight / 100 * point;
-								}
-								tempSum = (tempSum / lpm.getValue().size());
-								sumList.add(tempSum);
-							}
-							itemWeightList.add(new ItemWeight(sumList.stream().collect(Collectors.summingDouble(point -> {
-								double count = 0.0;
-								count += point;
-								return count;})), entry.getKey()));
-						}
 						//计算汇总
 						sum = itemWeightList.stream().collect(Collectors.summingDouble(itemWeight -> {
 							double sumOfAllItem = 0.0;
@@ -132,9 +103,74 @@ public class StatServiceImpl implements IStatService {
 						resultList.add(resultMap);
 					}
 				}
+				//对分组之后的被考核人按总分进行从高到低的排序
+				orderByScoreOfSum(resultList);
 			}
 		}
 		return resultList;
+	}
+	
+	private void orderByScoreOfSum(List<Map<String, Object>> resultList) {
+		Collections.sort(resultList, (param1, param2) -> {
+			Map<String, Object> map1 = (Map<String, Object> )param1;
+			Map<String, Object> map2 = (Map<String, Object> )param2;
+			Double sum1 = (Double) map1.get("sum");
+			sum1 = null == sum1 ? 0.0 : sum1;
+			Double sum2 = (Double) map2.get("sum");
+			sum2 = null == sum2 ? 0.0 : sum2;
+			return - sum1.compareTo(sum2);
+		});
+	}
+
+	private List<ItemWeight> computeScorePerItem(List<KhxtPerformancePoint> list) {
+		//存储每种指标的权重计算之后
+		List<ItemWeight> itemWeightList = new ArrayList<>();
+		//对按被考核人进行分组之后 的每组 按指标进行分组
+		Map<String, List<KhxtPerformancePoint>> pointMap = list.stream().collect(groupingBy(KhxtPerformancePoint::getItemId));
+		for (Map.Entry<String, List<KhxtPerformancePoint>> entry : pointMap.entrySet()) {
+			Map<String, List<KhxtPerformancePoint>> levelPointMap = groupByLevelId(entry);
+			List<Double> sumList = computeScorePerLevel(levelPointMap);
+			itemWeightList.add(new ItemWeight(sumList.stream().collect(Collectors.summingDouble(point -> {
+				double count = 0.0;
+				count += point;
+				return count;})), entry.getKey()));
+		}
+		return itemWeightList;
+	}
+
+	private List<Double> computeScorePerLevel(Map<String, List<KhxtPerformancePoint>> levelPointMap) {
+		//对得分进行计算
+		List<Double> sumList = new ArrayList<>();
+		for (Map.Entry<String, List<KhxtPerformancePoint>> lpm : levelPointMap.entrySet()) {
+			String levelId = lpm.getKey();
+			Double tempSum = 0.0;
+			for (KhxtPerformancePoint pp : lpm.getValue()) {
+				Double point = pp.getPoint();
+				Double weight = Double.valueOf(WeightUtil.findWeightByLevelId(levelId, pp.getKhxtPerformanceMembers().getAppraiseSheet().getLevelWeight().getWeight()));
+				tempSum += weight / 100 * point;
+			}
+			tempSum = (tempSum / lpm.getValue().size());
+			sumList.add(tempSum);
+		}
+		return sumList;
+	}
+
+	private Map<String, List<KhxtPerformancePoint>> groupByLevelId(Map.Entry<String, List<KhxtPerformancePoint>> entry) {
+		//按人员级别对人员评分进行分组
+		Map<String, List<KhxtPerformancePoint>> levelPointMap = new HashMap<>();
+		List<KhxtPerformancePoint> targetList = null;
+		for (KhxtPerformancePoint p : entry.getValue()) {
+			KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(p.getKhxtPerformanceMembers().getKhrPerson().getId());
+			String levelId = levelPerson.getLevelId();
+			if(levelPointMap.containsKey(levelId)) {
+				levelPointMap.get(levelId).add(p);
+			} else {
+				targetList = new ArrayList<>();
+				targetList.add(p);
+				levelPointMap.put(levelId, targetList);
+			}
+		}
+		return levelPointMap;
 	}
 	
 	private String setBkhrPersonName(String name, String weight) {
@@ -172,10 +208,8 @@ public class StatServiceImpl implements IStatService {
 					khxtPerformanceMembers.setBkhrPersonId(bkhrPersonIds.get(i));
 					List<KhxtPerformanceMembers> memberList = khxtPerformanceMembersService.find(khxtPerformanceMembers, true);
 					if (null != memberList && !memberList.isEmpty()) {
-						int size = memberList.size();
-						CellMergeRange cellMergeRange = new CellMergeRange(index, index + size);
-						index += size + 1;
-						cellRangeList.add(cellMergeRange);
+						//构建单元格合并范围
+						index = buildCellMergeRange(cellRangeList, index, memberList);
 						
 						//收集所有的item对应的指标分数信息
 						List<KhxtPerformancePoint> list = new ArrayList<>();
@@ -201,50 +235,17 @@ public class StatServiceImpl implements IStatService {
 								}
 							}
 							list.addAll(performancePoints);
-							//增加汇总
-							memberMap.put("totalPoints", member.getTotalPoints());
+							Double totalPoints = member.getTotalPoints();
+							if(null != totalPoints) {
+								//增加汇总
+								memberMap.put("totalPoints", totalPoints);
+							}
 							resultList.add(memberMap);
 						}
 						
 						//增加按被考核人分组之后的每组小计及汇总
+						List<ItemWeight> itemWeightList = computeScorePerItem(list);
 						double sum = 0.0;
-						//存储每种指标的权重计算之后
-						List<ItemWeight> itemWeightList = new ArrayList<>();
-						//对按被考核人进行分组之后 的每组 按指标进行分组
-						Map<String, List<KhxtPerformancePoint>> pointMap = list.stream().collect(groupingBy(KhxtPerformancePoint::getItemId));
-						for (Map.Entry<String, List<KhxtPerformancePoint>> entry : pointMap.entrySet()) {
-							//按人员级别对人员评分进行分组
-							Map<String, List<KhxtPerformancePoint>> levelPointMap = new HashMap<>();
-							List<KhxtPerformancePoint> targetList = null;
-							for (KhxtPerformancePoint p : entry.getValue()) {
-								KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(p.getKhxtPerformanceMembers().getKhrPerson().getId());
-								String levelId = levelPerson.getLevelId();
-								if(levelPointMap.containsKey(levelId)) {
-									levelPointMap.get(levelId).add(p);
-								} else {
-									targetList = new ArrayList<>();
-									targetList.add(p);
-									levelPointMap.put(levelId, targetList);
-								}
-							}
-							//对得分进行计算
-							List<Double> sumList = new ArrayList<>();
-							for (Map.Entry<String, List<KhxtPerformancePoint>> lpm : levelPointMap.entrySet()) {
-								String levelId = lpm.getKey();
-								Double tempSum = 0.0;
-								for (KhxtPerformancePoint pp : lpm.getValue()) {
-									Double point = pp.getPoint();
-									Double weight = Double.valueOf(WeightUtil.findWeightByLevelId(levelId, pp.getKhxtPerformanceMembers().getAppraiseSheet().getLevelWeight().getWeight()));
-									tempSum += weight / 100 * point;
-								}
-								tempSum = (tempSum / lpm.getValue().size());
-								sumList.add(tempSum);
-							}
-							itemWeightList.add(new ItemWeight(sumList.stream().collect(Collectors.summingDouble(point -> {
-								double count = 0.0;
-								count += point;
-								return count;})), entry.getKey()));
-						}
 						//计算汇总
 						sum = itemWeightList.stream().collect(Collectors.summingDouble(itemWeight -> {
 							double sumOfAllItem = 0.0;
@@ -265,9 +266,10 @@ public class StatServiceImpl implements IStatService {
 								}
 							}
 						}
-						
-						//增加汇总
-						memberMap.put("sum", sum);
+						if(0.0 != sum) {
+							//增加汇总
+							memberMap.put("sum", sum);
+						}
 						resultList.add(memberMap);
 					}
 				}
@@ -276,6 +278,14 @@ public class StatServiceImpl implements IStatService {
 			datas.put("cellRanges", cellRangeList);
 		}
 		return datas;
+	}
+
+	private int buildCellMergeRange(List<CellMergeRange> cellRangeList, int index, List<KhxtPerformanceMembers> memberList) {
+		int size = memberList.size();
+		CellMergeRange cellMergeRange = new CellMergeRange(index, index + size);
+		index += size + 1;
+		cellRangeList.add(cellMergeRange);
+		return index;
 	}
 
 }

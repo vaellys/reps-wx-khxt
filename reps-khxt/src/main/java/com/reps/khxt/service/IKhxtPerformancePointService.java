@@ -1,5 +1,7 @@
 package com.reps.khxt.service;
 
+import java.util.List;
+
 import com.reps.core.exception.RepsException;
 import com.reps.khxt.entity.KhxtPerformancePoint;
 
@@ -24,5 +26,7 @@ public interface IKhxtPerformancePointService {
 	 * @throws RepsException
 	 */
 	public KhxtPerformancePoint get(String id) throws RepsException;
+
+	public List<KhxtPerformancePoint> find(KhxtPerformancePoint khxtPerformancePoint);
 	
 }

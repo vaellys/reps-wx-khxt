@@ -41,7 +41,7 @@
 				
 				<reps:gridfield title="考核对象" width="10" align="center">${sheet.bkhr.name}</reps:gridfield>
 				
-				<reps:gridfield title="填报截止时间" width="15" align="center">${sheet.endEate}</reps:gridfield>
+				<reps:gridfield title="填报截止时间" width="15" align="center">${sheet.endDate}</reps:gridfield>
 				
 				<reps:gridfield title="完成情况" width="25" align="center">
 					<c:if test="${sheet.progress == '0'}">未完成</c:if>

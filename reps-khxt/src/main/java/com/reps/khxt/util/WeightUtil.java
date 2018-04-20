@@ -38,5 +38,5 @@ public class WeightUtil {
 		}
 		return "0";
 	}
-	
+
 }

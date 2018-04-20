@@ -16,7 +16,7 @@
 					<reps:datepicker name="appraiseSheet.beginDate" format="yyyy年MM月dd日" />
 				</reps:formfield>
 			<reps:formfield label="结束时间" >
-					<reps:datepicker name="appraiseSheet.endEate" format="yyyy年MM月dd日" />
+					<reps:datepicker name="appraiseSheet.endDate" format="yyyy年MM月dd日" />
 			</reps:formfield>
 			
 			<reps:formfield label="被考核人姓名" labelStyle="width:20%;" textStyle="width:27%;">

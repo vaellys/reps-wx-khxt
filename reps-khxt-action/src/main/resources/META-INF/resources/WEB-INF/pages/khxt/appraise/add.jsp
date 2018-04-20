@@ -30,7 +30,7 @@
 					<reps:datepicker name="beginDate" format="yyyy-MM-dd" />
 				</reps:formfield>
 				<reps:formfield label="填报截止时间" >
-					<reps:datepicker name="endEate" format="yyyy-MM-dd" />
+					<reps:datepicker name="endDate" format="yyyy-MM-dd" />
 				</reps:formfield>
 				
 				<reps:formfield label="考核人" >

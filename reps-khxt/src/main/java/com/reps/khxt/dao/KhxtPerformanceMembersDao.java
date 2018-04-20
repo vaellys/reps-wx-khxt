@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.reps.core.exception.RepsException;
 import com.reps.core.orm.IGenericDao;
-import com.reps.core.orm.ListResult;
 import com.reps.core.util.DateUtil;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.entity.KhxtAppraiseSheet;
@@ -51,6 +51,8 @@ public class KhxtPerformanceMembersDao {
 	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers khxtPerformanceMembers) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
 		dc.createAlias("appraiseSheet", "p");
+		dc.createAlias("bkhrPerson", "person");
+		dc.createAlias("khrPerson", "k");
 		if (null != khxtPerformanceMembers) {
 			String khrPersonId = khxtPerformanceMembers.getKhrPersonId();
 			if (StringUtil.isNotBlank(khrPersonId)) {
@@ -68,6 +70,10 @@ public class KhxtPerformanceMembersDao {
 			if (null != bkhrPersonId) {
 				dc.add(Restrictions.eq("bkhrPersonId", bkhrPersonId));
 			}
+			String khrPersonName = khxtPerformanceMembers.getKhrPersonName();
+			if(StringUtil.isNotBlank(khrPersonName)) {
+				dc.add(Restrictions.like("k.name", khrPersonName, MatchMode.ANYWHERE));
+			}
 			KhxtAppraiseSheet sheet = khxtPerformanceMembers.getAppraiseSheet();
 			if (sheet != null) {
 				String name = sheet.getName();
@@ -78,20 +84,40 @@ public class KhxtPerformanceMembersDao {
 				if (StringUtils.isNotBlank(season)) {
 					dc.add(Restrictions.eq("p.season", season));
 				}
+				String beginDate = sheet.getBeginDate();
+				if (StringUtils.isNotBlank(beginDate)) {
+					dc.add(Restrictions.eq("p.beginDate",DateUtil.formatStrDateTime(beginDate, "yyyy年MM月dd日", "yyyyMMdd")));
+				}
+				String endEate = sheet.getEndDate();
+				if (StringUtils.isNotBlank(endEate)) {
+					dc.add(Restrictions.eq("p.endDate",	DateUtil.formatStrDateTime(endEate, "yyyy年MM月dd日", "yyyyMMdd")));
+				}
+			}
+			Person bkhrPerson = khxtPerformanceMembers.getBkhrPerson();
+			if (bkhrPerson != null) {
+				String name = bkhrPerson.getName();
+				if (StringUtil.isNotBlank(name)) {
+					dc.add(Restrictions.eq("person.name", name));
+				}
 			}
 		}
 		return dao.findByCriteria(dc);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<String> findByGroup(KhxtPerformanceMembers khxtPerformanceMembers) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
 		dc.createAlias("appraiseSheet", "s");
+		dc.createAlias("bkhrPerson", "b");
 		dc.setProjection(Projections.groupProperty("bkhrPersonId"));
-		if(null != khxtPerformanceMembers) {
+		if (null != khxtPerformanceMembers) {
 			String sheetId = khxtPerformanceMembers.getSheetId();
-			if(StringUtil.isNotBlank(sheetId)) {
+			if (StringUtil.isNotBlank(sheetId)) {
 				dc.add(Restrictions.eq("s.id", sheetId));
+			}
+			String bkhrPersonName = khxtPerformanceMembers.getBkhrPersonName();
+			if(StringUtil.isNotBlank(bkhrPersonName)) {
+				dc.add(Restrictions.like("b.name", bkhrPersonName, MatchMode.ANYWHERE));
 			}
 		}
 		return dc.getExecutableCriteria(dao.getSession()).list();
@@ -124,34 +150,4 @@ public class KhxtPerformanceMembersDao {
 		}
 		return dao.getRowCount(dc).intValue();
 	}
-
-	public ListResult<KhxtPerformanceMembers> query(int startRow, int pageSize,	KhxtPerformanceMembers khxtPerformanceMembers) {
-		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
-		dc.createAlias("appraiseSheet", "sheet");
-		dc.createAlias("bkhrPerson", "person");
-
-		if (null != khxtPerformanceMembers) {
-			KhxtAppraiseSheet sheet = khxtPerformanceMembers.getAppraiseSheet();
-			if (sheet != null) {
-				String beginDate = sheet.getBeginDate();
-				if (StringUtils.isNotBlank(beginDate)) {
-					dc.add(Restrictions.eq("sheet.beginDate", DateUtil.formatStrDateTime(beginDate, "yyyy年MM月dd日", "yyyyMMdd")));
-				}
-
-				String endEate = sheet.getEndEate();
-				if (StringUtils.isNotBlank(endEate)) {
-					dc.add(Restrictions.eq("sheet.endEate", DateUtil.formatStrDateTime(endEate, "yyyy年MM月dd日", "yyyyMMdd")));
-				}
-			}
-			Person bkhrPerson = khxtPerformanceMembers.getBkhrPerson();
-			if (bkhrPerson != null) {
-				String name = bkhrPerson.getName();
-				if (StringUtil.isNotBlank(name)) {
-					dc.add(Restrictions.eq("person.name", name));
-				}
-			}
-		}
-		return dao.query(dc, startRow, pageSize);
-	}
-
 }

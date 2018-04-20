@@ -39,8 +39,8 @@ div#b2 {
 					</reps:formfield>
 
 					<reps:formfield label="填报截止时间">
-						<reps:datepicker name="endEate" format="yyyy-MM-dd"
-							value="${sheet.endEate }" />
+						<reps:datepicker name="endDate" format="yyyy-MM-dd"
+							value="${sheet.endDate }" />
 					</reps:formfield>
 
 					<reps:formfield label="考核人">

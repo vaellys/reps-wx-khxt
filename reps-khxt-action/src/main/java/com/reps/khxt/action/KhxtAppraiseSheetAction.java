@@ -80,7 +80,7 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 	private IKhxtItemService itemService;
 
 	@Autowired
-	private IKhxtKhrProcessService KhxtKhrProcessService;
+	private IKhxtKhrProcessService khxtKhrProcessService;
 
 	@Autowired
 	private IKhxtAppraiseSheetFileService fileService;
@@ -164,8 +164,8 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 			for (KhxtPerformanceMembers khxtPerformanceMembers : list) {
 				KhxtAppraiseSheet appraiseSheet = sheetService.get(khxtPerformanceMembers.getSheetId());
 				// 处理日期
-				String endEate = appraiseSheet.getEndEate();
-				appraiseSheet.setEndEate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
+				String endEate = appraiseSheet.getEndDate();
+				appraiseSheet.setEndDate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
 				appraiseSheet.setStatus(Integer.valueOf(khxtPerformanceMembers.getStatus()));
 				// 过滤数据
 				map.put(appraiseSheet.getId(), appraiseSheet);
@@ -328,7 +328,7 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		ModelAndView mav = getModelAndView("/khxt/appraise/edit");
 		KhxtAppraiseSheet sheet = sheetService.get(sheetId);
 		// 处理日期
-		sheet.setEndEate(DateUtil.transToDate_yyyyMMdd(sheet.getEndEate()));
+		sheet.setEndDate(DateUtil.transToDate_yyyyMMdd(sheet.getEndDate()));
 		sheet.setBeginDate(DateUtil.transToDate_yyyyMMdd(sheet.getBeginDate()));
 
 		String[] khrIds = sheet.getKhrId().split(",");
@@ -590,9 +590,9 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		// 设置考核人
 		for (KhxtAppraiseSheet appraiseSheet : listResult.getList()) {
 			appraiseSheet
-					.setCheckKhr(KhxtKhrProcessService.checkKhr(appraiseSheet.getId(), currentToken.getPersonId()));
+					.setCheckKhr(khxtKhrProcessService.checkKhr(appraiseSheet.getId(), currentToken.getPersonId()));
 			appraiseSheet.setCheckCompletedMarking(
-					KhxtKhrProcessService.checkCompletedMarking(appraiseSheet.getId(), currentToken.getPersonId()));
+					khxtKhrProcessService.checkCompletedMarking(appraiseSheet.getId(), currentToken.getPersonId()));
 			appraiseSheet.setWeightDisplay(
 					getLevelWeightDisplay(appraiseSheet.getKhrId(), appraiseSheet.getLevelWeight().getWeight()));
 		}
@@ -644,8 +644,8 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		// 处理显示时间
 		String season = sheet.getSeason();
 		sheet.setSeason(DateUtil.formatStrDateTime(season, "yyyyMM", "yyyy年MM月"));
-		String endEate = sheet.getEndEate();
-		sheet.setEndEate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
+		String endEate = sheet.getEndDate();
+		sheet.setEndDate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
 		String beginDate = sheet.getBeginDate();
 		sheet.setBeginDate(DateUtil.formatStrDateTime(beginDate, "yyyyMMdd", "yyyy年MM月dd日"));
 		// 查询考核文件

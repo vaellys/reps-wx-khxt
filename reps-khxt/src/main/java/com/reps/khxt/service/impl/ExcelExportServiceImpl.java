@@ -14,12 +14,13 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Service;
 
 import com.reps.core.exception.RepsException;
-import com.reps.khxt.entity.CellMergeRange;
 import com.reps.khxt.service.IExcelExportService;
+import com.reps.khxt.vo.CellMergeRange;
 
 @Service
 public class ExcelExportServiceImpl implements IExcelExportService {
@@ -37,6 +38,7 @@ public class ExcelExportServiceImpl implements IExcelExportService {
 			wb = new HSSFWorkbook();
 			HSSFCellStyle style = wb.createCellStyle();
 			style.setAlignment(HorizontalAlignment.CENTER);
+			style.setVerticalAlignment(VerticalAlignment.CENTER);
 			HSSFSheet sheet = wb.createSheet(sheetName);
 			HSSFRow firstRow = sheet.createRow(0);
 			for (int i = 0; i < headers.length; i++) {

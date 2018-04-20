@@ -7,10 +7,10 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reps.core.orm.IdEntity;
-
 
 /**
  * 
@@ -24,30 +24,43 @@ import com.reps.core.orm.IdEntity;
 public class KhxtPerformancePoint extends IdEntity implements Serializable {
 
 	private static final long serialVersionUID = -4949689189823390197L;
-	
+
 	/** 人员名单ID */
-	@Column(name = "member_id", nullable = false, length = 32, insertable=false, updatable=false)
+	@Column(name = "member_id", nullable = false, length = 32, insertable = false, updatable = false)
 	private String memberId;
 
-	/** 人员名单*/
+	/** 人员名单 */
 	@JsonIgnore
-    @ManyToOne(cascade = {})
-    @JoinColumn(name = "member_id")
-    private KhxtPerformanceMembers khxtPerformanceMembers;
-	
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "member_id")
+	private KhxtPerformanceMembers khxtPerformanceMembers;
+
 	/** 人员名单ID */
-	@Column(name = "item_id", nullable = false, length = 32, insertable=false, updatable=false)
+	@Column(name = "item_id", nullable = false, length = 32, insertable = false, updatable = false)
 	private String itemId;
-	
-	/** 指标ID*/
+
+	/** 指标ID */
 	@JsonIgnore
-    @ManyToOne(cascade = {})
-    @JoinColumn(name = "item_id")
-    private KhxtItem khxtItem;
+	@ManyToOne(cascade = {})
+	@JoinColumn(name = "item_id")
+	private KhxtItem khxtItem;
 
 	/** 分数 */
 	@Column(name = "point")
 	private Double point;
+	
+	/**保存合计*/
+	@JsonIgnore
+	@Transient
+	private Double totalScore;
+
+	public Double getTotalScore() {
+		return totalScore;
+	}
+
+	public void setTotalScore(Double double1) {
+		this.totalScore = double1;
+	}
 
 	public String getMemberId() {
 		return memberId;
@@ -88,6 +101,5 @@ public class KhxtPerformancePoint extends IdEntity implements Serializable {
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
 	}
-	
+
 }
-	

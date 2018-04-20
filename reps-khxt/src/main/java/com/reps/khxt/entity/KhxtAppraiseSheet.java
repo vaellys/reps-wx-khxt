@@ -82,7 +82,7 @@ public class KhxtAppraiseSheet extends IdEntity implements Serializable {
 
 	/** 截止填报时间 */
 	@Column(name = "end_date", length = 16)
-	private String endEate;
+	private String endDate;
 
 	/** 添加时间 */
 	@Column(name = "add_time")
@@ -252,12 +252,12 @@ public class KhxtAppraiseSheet extends IdEntity implements Serializable {
 		this.beginDate = beginDate;
 	}
 
-	public String getEndEate() {
-		return endEate;
+	public String getEndDate() {
+		return endDate;
 	}
 
-	public void setEndEate(String endEate) {
-		this.endEate = endEate;
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
 	}
 
 	public Short getProgress() {

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.reps.core.exception.RepsException;
-import com.reps.khxt.entity.CellMergeRange;
+import com.reps.khxt.vo.CellMergeRange;
 
 public interface IExcelExportService {
 

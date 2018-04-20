@@ -104,8 +104,8 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 		for (KhxtAppraiseSheet khxtAppraiseSheet : list) {
 
 			// 处理日期
-			String endEate = khxtAppraiseSheet.getEndEate();
-			khxtAppraiseSheet.setEndEate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
+			String endEate = khxtAppraiseSheet.getEndDate();
+			khxtAppraiseSheet.setEndDate(DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日"));
 
 			String season = khxtAppraiseSheet.getSeason();
 			khxtAppraiseSheet.setSeason(DateUtil.formatStrDateTime(season, "yyyyMM", "yyyy年MM月"));
@@ -166,7 +166,7 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 					khxtAppraiseSheet.setProgress(ProgressStatus.FINISHED.getId());
 				}
 				// 截止时间
-				String endEate = khxtAppraiseSheet.getEndEate();
+				String endEate = khxtAppraiseSheet.getEndDate();
 				DateUtil.formatStrDateTime(endEate, "yyyyMMdd", "yyyy年MM月dd日");
 				Calendar calendar = DateUtil.getCalendarFromStr(endEate, "yyyyMMdd");
 				// 现在时间
@@ -240,7 +240,7 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 		Date date = new Date();
 		
 		sheet.setBeginDate(DateUtil.formatStrDateTime(sheet.getBeginDate(), "yyyy-MM-dd", "yyyyMMdd"));
-		sheet.setEndEate(DateUtil.formatStrDateTime(sheet.getEndEate(), "yyyy-MM-dd", "yyyyMMdd"));
+		sheet.setEndDate(DateUtil.formatStrDateTime(sheet.getEndDate(), "yyyy-MM-dd", "yyyyMMdd"));
 
 		sheet.setAddTime(date);
 		sheet.setBkhrCount(bkhrCount(khrids, sheet.getBkhr().getId()));
@@ -303,11 +303,8 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 			set.add(item);
 		}
 		// 处理日期
-		String[] benin = sheet.getBeginDate().split("-");
-		sheet.setBeginDate(benin[0] + benin[1] + benin[2]);
-		String[] end = sheet.getEndEate().split("-");
-		sheet.setEndEate(end[0] + end[1] + end[2]);
-
+		sheet.setBeginDate(DateUtil.formatStrDateTime(sheet.getBeginDate(), "yyyy-MM-dd", "yyyyMMdd"));
+		sheet.setEndDate(DateUtil.formatStrDateTime(sheet.getEndDate(), "yyyy-MM-dd", "yyyyMMdd"));
 		// 查询考核权重
 		KhxtLevelWeight levelWeight = weightDao.get(sheet.getLevelWeight().getId());
 		// 判断是否需要修改考核人员名单
@@ -339,7 +336,7 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 		khxtAppraiseSheet.setSeason(sheet.getSeason());
 		khxtAppraiseSheet.setKhrId(sheet.getKhrId());
 		khxtAppraiseSheet.setBeginDate(sheet.getBeginDate());
-		khxtAppraiseSheet.setEndEate(sheet.getEndEate());
+		khxtAppraiseSheet.setEndDate(sheet.getEndDate());
 		khxtAppraiseSheet.setLevelWeight(levelWeight);
 		khxtAppraiseSheet.setItem(set);
 		dao.update(khxtAppraiseSheet);

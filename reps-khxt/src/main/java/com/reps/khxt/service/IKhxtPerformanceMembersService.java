@@ -3,7 +3,6 @@ package com.reps.khxt.service;
 import java.util.List;
 
 import com.reps.core.exception.RepsException;
-import com.reps.core.orm.ListResult;
 import com.reps.khxt.entity.KhxtPerformanceMembers;
 
 public interface IKhxtPerformanceMembersService {
@@ -61,8 +60,9 @@ public interface IKhxtPerformanceMembersService {
 	 * @param members
 	 * @return
 	 * @return List<KhxtPerformanceMembers>
+	 * @throws Exception 
 	 */
-	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers members);
+	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers members) throws Exception;
 	
 	public List<String> findByGroup(KhxtPerformanceMembers members) throws RepsException;
 
@@ -76,7 +76,8 @@ public interface IKhxtPerformanceMembersService {
 	 * @param khxtPerformanceMembers
 	 * @return
 	 * @return List<KhxtPerformanceMembers>
+	 * @throws Exception 
 	 */
-	public ListResult<KhxtPerformanceMembers> query(int startRow, int pageSize, KhxtPerformanceMembers khxtPerformanceMembers);
+	List<KhxtPerformanceMembers> query(KhxtPerformanceMembers khxtPerformanceMembers) throws Exception;
 
 }

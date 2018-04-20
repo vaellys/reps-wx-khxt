@@ -17,6 +17,7 @@ table.gridtable {
 	width: 80%;
 	margin-left: 30px;
 	text-align:center;
+	margin-top: 5px;
 }
 
 table.gridtable th {
@@ -50,7 +51,7 @@ table.gridtable td {
 		<reps:panel id="myform" dock="top" action="add.mvc" formId="xform"
 			validForm="true">
 					<table class="gridtable" id="gridTable">
-					<caption>2018年2月科员考核</caption>
+					<caption style="padding: 8px;font-weight: bold;">${sheet.season }${sheet.name }</caption>
 						<tbody>
 							<tr>
 								<th>序号</th>
@@ -75,7 +76,10 @@ table.gridtable td {
 									<c:if test="${s.count == 1 }">
 									<td rowspan="${member.itemList.size() + 1}">${status.count }</td>
 									<td rowspan="${member.itemList.size() + 1}">
-									${member.bkhrPersonName }
+									<reps:dialog cssClass="" id="detail" iframe="true"
+											width="600" height="200"
+											url="${ctx }/reps/khxt/member/workdetail.mvc?sheetId=${member.sheetId }&personId=${member.bkhrPersonId }"
+											value="${member.bkhrPersonName }"></reps:dialog>
 									</td>
 									</c:if>
 									
@@ -83,7 +87,7 @@ table.gridtable td {
 									<c:forEach var="item" items="${items}" >
 										<td><c:forEach var="p" items="${i.itemPoints}"><c:if test="${p.itemId == item.id }"><fmt:formatNumber value="${p.point }" pattern="#.#" /></c:if></c:forEach></td>
 									</c:forEach>
-									<td>${i.sumOfPerRow }</td>
+									<td><fmt:formatNumber value="${i.sumOfPerRow }" pattern="#.#" /></td>
 								</tr>
 							</c:forEach>
 							<tr>
@@ -95,7 +99,7 @@ table.gridtable td {
 									</c:forEach>
 								</td>
 								</c:forEach>
-								<td>${member.sum }</td>
+								<td><c:if test="${member.sum != 0}"><fmt:formatNumber value="${member.sum }" pattern="#.#" /></c:if><c:if test="${member.sum == 0}">&nbsp;</c:if></td>
 								
 							</tr>
 							</c:forEach>

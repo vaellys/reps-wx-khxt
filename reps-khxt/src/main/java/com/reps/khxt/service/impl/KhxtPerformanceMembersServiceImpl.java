@@ -1,30 +1,39 @@
 package com.reps.khxt.service.impl;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reps.core.exception.RepsException;
-import com.reps.core.orm.ListResult;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtPerformanceMembersDao;
+import com.reps.khxt.entity.KhxtAppraiseSheet;
 import com.reps.khxt.entity.KhxtItem;
 import com.reps.khxt.entity.KhxtKhrProcess;
+import com.reps.khxt.entity.KhxtLevelPerson;
+import com.reps.khxt.entity.KhxtLevelWeight;
 import com.reps.khxt.entity.KhxtPerformanceMembers;
 import com.reps.khxt.entity.KhxtPerformancePoint;
 import com.reps.khxt.enums.AppraiseStatus;
 import com.reps.khxt.enums.MarkStatus;
+import com.reps.khxt.service.IKhxtAppraiseSheetService;
 import com.reps.khxt.service.IKhxtKhrProcessService;
 import com.reps.khxt.service.IKhxtLevelPersonService;
 import com.reps.khxt.service.IKhxtPerformanceMembersService;
@@ -51,16 +60,26 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	@Autowired
 	private IKhxtLevelPersonService personService;
 
+	@Autowired
+	private IKhxtLevelPersonService khxtLevelPersonService;
+
+	@Autowired
+	private IKhxtPerformancePointService pointService;
+
+	@Autowired
+	private IKhxtAppraiseSheetService khxtAppraiseSheetService;
+
 	@Override
 	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers khxtPerformanceMembers, boolean eager)
 			throws RepsException {
 		if (null == khxtPerformanceMembers) {
 			throw new RepsException("参数异常");
 		}
-		/*String khrPersonId = khxtPerformanceMembers.getKhrPersonId();
-		if (StringUtil.isBlank(khrPersonId)) {
-			throw new RepsException("参数异常:考核人ID为空");
-		}*/
+		/*
+		 * String khrPersonId = khxtPerformanceMembers.getKhrPersonId(); if
+		 * (StringUtil.isBlank(khrPersonId)) { throw new
+		 * RepsException("参数异常:考核人ID为空"); }
+		 */
 		List<KhxtPerformanceMembers> resultList = dao.find(khxtPerformanceMembers);
 		if (eager) {
 			if (null != resultList && !resultList.isEmpty()) {
@@ -172,7 +191,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	}
 
 	@Override
-	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers members) {
+	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers members) throws Exception {
 		List<KhxtPerformanceMembers> list = dao.find(members);
 
 		if (null != list && !list.isEmpty()) {
@@ -180,8 +199,131 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 				Hibernate.initialize(member.getPerformancePoints());
 			}
 		}
+		KhxtAppraiseSheet sheet = khxtAppraiseSheetService.get(members.getSheetId(), true);
+		// 计算合计
+		Map<String, Double> map = calculateScore(sheet);
+		// 处理考核人显示
+		getJson2String(list, sheet);
+		// 处理页面显示指标
+		KhxtPerformanceMembers members1 = list.get(0);
+
+		List<KhxtPerformancePoint> KhxtPerformancePoint = members1.getPerformancePoints();
+		// 处理页面显示指标和合计
+		if (CollectionUtils.isEmpty(KhxtPerformancePoint)) {
+			for (KhxtPerformanceMembers formanmembers : list) {
+				if (!CollectionUtils.isEmpty(formanmembers.getPerformancePoints())) {
+					List<KhxtPerformancePoint> list2 = formanmembers.getPerformancePoints();
+
+					for (KhxtPerformancePoint khxtPerformancePoint2 : list2) {
+
+						KhxtPerformancePoint point = new KhxtPerformancePoint();
+
+						KhxtItem khxtItem = khxtPerformancePoint2.getKhxtItem();
+
+						point.setKhxtItem(khxtItem);
+						Double double1 = map.get(khxtItem.getId());
+						point.setTotalScore(double1);
+						KhxtPerformancePoint.add(point);
+					}
+					break;
+				}
+			}
+		} else {
+			for (KhxtPerformanceMembers performanceMembers : list) {
+				List<KhxtPerformancePoint> points = performanceMembers.getPerformancePoints();
+				for (KhxtPerformancePoint khxtPerformancePoint : points) {
+					String itemId = khxtPerformancePoint.getItemId();
+					Double double1 = map.get(itemId);
+					khxtPerformancePoint.setTotalScore(double1);
+				}
+				break;
+			}
+		}
+		return list;
+	}
+
+	private List<KhxtPerformanceMembers> getJson2String(List<KhxtPerformanceMembers> list, KhxtAppraiseSheet sheet)
+			throws Exception {
+		List<Map<String, String>> jsonweight = getJsonWeight(sheet);
+
+		for (KhxtPerformanceMembers members : list) {
+			// 根据personid查询
+			KhxtLevelPerson person = khxtLevelPersonService.getByPersonId(members.getKhrPersonId());
+			if (StringUtils.equals(person.getPersonId(), members.getKhrPerson().getId())) {
+
+				for (Map<String, String> map : jsonweight) {
+					if (StringUtils.equals(map.get("levelId"), person.getLevelId())) {
+						String name = members.getKhrPerson().getName();
+						members.getKhrPerson().setName(name + "(" + map.get("weight") + "%" + ")");
+					}
+				}
+			}
+		}
 
 		return list;
+
+	}
+
+	// 计算合计
+	private Map<String, Double> calculateScore(KhxtAppraiseSheet sheet) throws Exception {
+		// 转换百分比
+		NumberFormat nf = NumberFormat.getPercentInstance();
+
+		Map<String, Double> scoreMap = new HashMap<>();
+
+		Set<KhxtItem> item = sheet.getItem();
+
+		List<Map<String, String>> jsonWeight = getJsonWeight(sheet);
+		// 封装查询条件
+		KhxtPerformancePoint khxtPerformancePoint = new KhxtPerformancePoint();
+		KhxtPerformanceMembers members = new KhxtPerformanceMembers();
+		members.setSheetId(sheet.getId());
+
+		for (KhxtItem khxtItem : item) {
+
+			// 根据月考核id+分类ID查询评分
+			khxtPerformancePoint.setItemId(khxtItem.getId());
+			khxtPerformancePoint.setKhxtPerformanceMembers(members);
+			List<KhxtPerformancePoint> points = pointService.find(khxtPerformancePoint);
+			// 计算总分数
+			double score = 0;
+			// 遍历级别
+			for (Map<String, String> map : jsonWeight) {
+				double b = 0;
+				int a = 0;
+				for (KhxtPerformancePoint point : points) {
+					// 查询出该评分属于那个级别
+					KhxtPerformanceMembers khxtPerformanceMembers = point.getKhxtPerformanceMembers();
+					String personId = khxtPerformanceMembers.getKhrPersonId();
+					// 查询该人员属于那个级别
+					KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(personId);
+					String personLevelId = levelPerson.getLevelId();
+
+					if (StringUtils.equals(map.get("levelId"), personLevelId)) {
+						double parse = (double) nf.parse(map.get("weight") + "%");
+						double c = point.getPoint() * parse;
+						b += c;
+						a++;
+					}
+
+				}
+				if (a != 0 && b != 0) {
+					score += b / a;
+				}
+			}
+			scoreMap.put(khxtItem.getId(), score);
+
+		}
+		return scoreMap;
+	}
+
+	// 将权重json转化为集合
+	private List<Map<String, String>> getJsonWeight(KhxtAppraiseSheet sheet) throws Exception {
+		ObjectMapper obj = new ObjectMapper();
+		KhxtLevelWeight levelWeight = sheet.getLevelWeight();
+		@SuppressWarnings("unchecked")
+		List<Map<String, String>> jsonweight = obj.readValue(levelWeight.getWeight(), List.class);
+		return jsonweight;
 	}
 
 	@Override
@@ -189,40 +331,40 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 		return dao.findByGroup(members);
 	}
 
-	@Override
-	public ListResult<KhxtPerformanceMembers> query(int startRow, int pageSize,
-			KhxtPerformanceMembers khxtPerformanceMembers) {
-		ListResult<KhxtPerformanceMembers> listResult = dao.query(startRow, pageSize, khxtPerformanceMembers);
+	/**
+	 * 被考核人查询
+	 */
+	public List<KhxtPerformanceMembers> query(KhxtPerformanceMembers khxtPerformanceMembers) throws Exception {
+		List<KhxtPerformanceMembers> listResult = dao.find(khxtPerformanceMembers);
 
-		List<KhxtPerformanceMembers> listMembers1 = listResult.getList();
-		// 保存机构名称
-		for (KhxtPerformanceMembers  members: listMembers1) {
-			members.setPersonOrganize(personService.getByPersonId(members.getBkhrPersonId()).getOrganize().getName());
-		}
 		List<KhxtPerformanceMembers> listMembers = new ArrayList<>();
 
-		//处理重复数据
+		// 过滤重复数据
 		Map<String, KhxtPerformanceMembers> map = new LinkedHashMap<>();
-		for (KhxtPerformanceMembers members1 : listMembers1) {
+		for (KhxtPerformanceMembers members : listResult) {
 
-			for (KhxtPerformanceMembers members2 : listMembers1) {
-				
-				if (StringUtil.equals(members1.getSheetId(), members2.getSheetId())) {
-
-					map.put(members2.getSheetId() + members2.getBkhrPersonId(), members2);
-				}
-			}
-
+			map.put(members.getSheetId() + members.getBkhrPersonId(), members);
 		}
 
 		for (String key : map.keySet()) {
-			listMembers.add(map.get(key));
+
+			KhxtPerformanceMembers members = map.get(key);
+			KhxtLevelPerson person = personService.getByPersonId(members.getBkhrPersonId());
+
+			members.setPersonOrganize(person.getOrganize().getName());
+
+			// 计算本月得分
+			Map<String, Double> score = calculateScore(members.getAppraiseSheet());
+			double total = 0;
+			for (String scorekey : score.keySet()) {
+				total += score.get(scorekey);
+			}
+			members.setTotalPoints(total);
+
+			listMembers.add(members);
 		}
 
-		listResult.setList(listMembers);
-		listResult.setCount((long) listMembers.size());
-
-		return listResult;
+		return listMembers;
 	}
 
 }

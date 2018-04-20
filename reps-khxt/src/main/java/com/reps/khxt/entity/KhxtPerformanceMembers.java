@@ -78,6 +78,14 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 	@JsonIgnore
 	@Transient
 	private String personOrganize;
+	
+	@JsonIgnore
+	@Transient
+	private String khrPersonName;
+	
+	@JsonIgnore
+	@Transient
+	private String bkhrPersonName;
 
 	public String getPersonOrganize() {
 		return personOrganize;
@@ -167,4 +175,20 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 		this.performancePoints = performancePoints;
 	}
 
+	public String getKhrPersonName() {
+		return khrPersonName;
+	}
+
+	public void setKhrPersonName(String khrPersonName) {
+		this.khrPersonName = khrPersonName;
+	}
+
+	public String getBkhrPersonName() {
+		return bkhrPersonName;
+	}
+
+	public void setBkhrPersonName(String bkhrPersonName) {
+		this.bkhrPersonName = bkhrPersonName;
+	}
+	
 }

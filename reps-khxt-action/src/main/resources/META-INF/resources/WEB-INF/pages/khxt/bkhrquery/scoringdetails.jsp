@@ -9,7 +9,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + port +
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>被考核人查询列表</title>
+	<title>评分详细</title>
 	<script type="text/javascript" src="<%=basePath%>/library/base/jquery-1.11.2.min.js"></script>
 	
 	
@@ -77,7 +77,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + port +
 </head>
 <body>
 <div>
-	<table  class="gridtable" style="float:left;margin-left:100px;">
+	<table id="table" class="gridtable" style="float:left;margin-left:100px;">
 		</br>
 		<tr >
 			<th align="left" style="border:0px;" colspan="2" class="size1">被考核人：${members.bkhrPerson.name}</th>
@@ -94,10 +94,10 @@ String basePath = request.getScheme() + "://" + request.getServerName() + port +
 				</c:forEach>
 			</c:forEach>
 			
-			<th align="center" id="center">本月得分</th>
+			<th align="center" id="center"></th>
 		</tr>
 			<c:forEach items="${list}"  var="members">
-				<tr>
+				<tr id="personScore">
 					<td id="index" align="center"></td>
 					<td align="center">${members.khrPerson.name}</td>
 					<c:choose>
@@ -115,6 +115,14 @@ String basePath = request.getScheme() + "://" + request.getServerName() + port +
 			</c:forEach>
 			<tr>
 				<td colspan="2" align="center" id="total">合计</td>
+				
+				<c:forEach items="${list}"  var="members" end="0">
+						<c:forEach items="${members.performancePoints}"  var="points">
+							<td align="center" id="totalScore">${points.totalScore}</td>
+						</c:forEach>
+				</c:forEach>
+				
+				
 				<td id="totalPoints" align="center"></td>
 			</tr>
 		</table>
@@ -141,13 +149,15 @@ String basePath = request.getScheme() + "://" + request.getServerName() + port +
 				$('tbody #monthscore').each(function(){
 					sum+=+$(this).text();
 						
-				})
+				});
+				var totalScore=0;
+				$('tbody #totalScore').each(function(){
+					totalScore+=+$(this).text();
+						
+				});
 				
 				$("#center").text("本月得分("+sum+")")
-				var b = length-3;
-				for (var i = 0; i < b; i++) {
-					$("#total").after("<td></td>")
-				}
+				$("#totalPoints").text(totalScore)
 			})
 	</script>
 </html>

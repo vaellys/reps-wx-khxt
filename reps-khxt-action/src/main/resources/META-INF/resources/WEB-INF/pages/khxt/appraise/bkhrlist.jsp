@@ -37,7 +37,7 @@
 				
 				<reps:gridfield title="考核对象" width="10" align="center">${sheet.bkhr.name}</reps:gridfield>
 				
-				<reps:gridfield title="填报截止时间" width="15" align="center">${sheet.endEate}</reps:gridfield>
+				<reps:gridfield title="填报截止时间" width="15" align="center">${sheet.endDate}</reps:gridfield>
 					
 				<reps:gridfield title="上报情况" width="25" align="center"><c:if test="${sheet.status == '0'}">未上报</c:if><c:if test="${sheet.status == '1'}">已上报</c:if><c:if test="${sheet.status == '2'}">已打分</c:if></reps:gridfield>
 

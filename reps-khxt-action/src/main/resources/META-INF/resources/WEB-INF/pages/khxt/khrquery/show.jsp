@@ -3,7 +3,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>评分</title>
+<title>评分详情</title>
 <reps:theme />
 <style type="text/css">
 
@@ -41,15 +41,12 @@ table.gridtable td {
 	<reps:container>
 		<reps:panel id="myform" dock="top" action="add.mvc" formId="xform"
 			validForm="true">
-					<div style="margin-bottom: 5px;margin-top: 10px;"><span style="margin-left: 30px; margin-right: 700px;font-size:14px;font-weight:700">${khxtAppraiseSheet.season }${khxtAppraiseSheet.name }</span> <span style="font-size:14px;font-weight:700;">考核人：${khrPersonName }</span></div>
-					<input type="hidden" name="memberJson" id="memberJson" value="">
-					<input type="hidden" name="itemPointJson" id="itemPointJson"
-						value="">
-					<input type="hidden" name="sheetId" value="${member.sheetId }">
-					<input type="hidden" name="khrPersonId" value="${member.khrPersonId }">
+					<div style="margin-bottom: 5px;margin-top: 10px;"><span style="margin-left: 30px; margin-right: 700px;font-size:14px;font-weight:700">考核人：${khrPersonName }</span></div>
 					<table class="gridtable" id="gridTable">
+						<caption style="padding: 8px;font-weight: bold;">${khxtAppraiseSheet.season }${khxtAppraiseSheet.name }</caption>
 						<tbody>
 							<tr>
+								<th>序号</th>
 								<th>被考核人</th>
 								<c:forEach var="item" items="${items}" varStatus="status">
 									<c:set var="count" value="${count+ item.point}" />
@@ -57,37 +54,29 @@ table.gridtable td {
 											value="${item.point}" pattern="#.#" />）
 									</th>
 								</c:forEach>
-								<th>合计（<fmt:formatNumber value="${count}"
+								<th>本月得分（<fmt:formatNumber value="${count}"
 										pattern="#00.#" />）
 								</th>
 							</tr>
 							<c:forEach var="member" items="${performanceMembers}"
 								varStatus="status">
 								<tr>
+									<td>${status.count }<br>
 									<td><reps:dialog cssClass="" id="detail" iframe="true"
 											width="600" height="200"
-											url="workdetail.mvc?sheetId=${member.appraiseSheet.id }&personId=${member.bkhrPerson.id }"
+											url="${ctx }/reps/khxt/member/workdetail.mvc?sheetId=${khxtAppraiseSheet.id }&personId=${member.bkhrPerson.id }"
 											value="${member.bkhrPerson.name }"></reps:dialog><br>
-									<c:if test="${member.status == 0}"><span> (未上报工作计划)</span></c:if>
 									</td>
 									<c:forEach var="item" items="${items}" varStatus="s">
 										<td>
-											<input class="txtInput moneyvalidate required" style="width:80%"
-											name="point${status.count }${s.count }" 
 											<c:forEach var="p" items="${member.performancePoints}" varStatus="s">
-												<c:if test="${item.id == p.itemId}">	value='<fmt:formatNumber
-											value="${p.point}" pattern="#.#" />' pointId="${p.id }" </c:if>
+												<c:if test="${item.id == p.itemId}"><fmt:formatNumber
+											value="${p.point}" pattern="#.#" /></c:if>
 											</c:forEach>
-											itemId="${item.id }" memberId="${member.id }" 
-											max="${item.point }" min="0"
-											onkeyup="return calculateTotalPoint($('#totalPoint${status.count }'), '${status.count }')" <c:if test="${member.status == 0}">disabled="disabled"</c:if>>
+											
 										</td>
 									</c:forEach>
-									<td><input class="txtInput moneyvalidate"
-										name="totalPoint${status.count }"
-										id="totalPoint${status.count }" memberId="${member.id }"
-										value="<fmt:formatNumber
-											value="${member.totalPoints}" pattern="#.#" />" <c:if test="${member.status == 0}">disabled="disabled"</c:if> readonly="readonly" style="width:80%"></td>
+									<td><fmt:formatNumber value="${member.totalPoints}" pattern="#.#" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -96,11 +85,8 @@ table.gridtable td {
 			</br>
 			</br>
 			<reps:formbar>
-				<reps:ajax messageCode="add.button.save" formId="xform"
-					callBack="my" type="button" cssClass="btn_save"
-					beforeCall="buildMemberAndItemJson()"></reps:ajax>
-				<reps:button cssClass="btn_cancel_a" messageCode="add.button.cancel"
-					onClick="back()"></reps:button>
+					<reps:button cssClass="btn_back" type="button" onClick="back()"
+					messageCode="manage.action.return" />
 			</reps:formbar>
 		</reps:panel>
 	</reps:container>
@@ -113,7 +99,7 @@ table.gridtable td {
 	};
 
 	function back() {
-		window.location.href = "${ctx}/reps/khxt/appraise/listpoint.mvc";
+		window.location.href = "${ctx}/reps/khxt/khrprocess/list.mvc";
 	}
 
 	function calculateTotalPoint($obj, index) {

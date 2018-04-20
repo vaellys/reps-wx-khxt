@@ -46,7 +46,7 @@
 				
 				<reps:gridfield title="考核人权重" width="35" align="center">${sheet.weight}</reps:gridfield>
 				
-				<reps:gridfield title="填报截止时间" width="15" align="center">${sheet.endEate}</reps:gridfield>
+				<reps:gridfield title="填报截止时间" width="15" align="center">${sheet.endDate}</reps:gridfield>
 				
 				<reps:gridfield title="考核对象人数" width="13" align="center">${sheet.bkhrCount}</reps:gridfield>
 				

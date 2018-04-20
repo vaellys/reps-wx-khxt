@@ -1,5 +1,7 @@
 package com.reps.khxt.service.impl;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -50,6 +52,12 @@ public class KhxtPerformancePointServiceImpl implements IKhxtPerformancePointSer
 			throw new RepsException("参数异常:个人考核评分ID无效");
 		}
 		return khxtPerformancePoint;
+	}
+
+	@Override
+	public List<KhxtPerformancePoint> find(KhxtPerformancePoint khxtPerformancePoint) {
+		
+		return dao.find(khxtPerformancePoint);
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.reps.khxt.entity;
+package com.reps.khxt.vo;
 
 public class CellMergeRange {
 	

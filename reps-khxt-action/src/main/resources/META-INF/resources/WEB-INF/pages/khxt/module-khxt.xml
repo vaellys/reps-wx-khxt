@@ -143,10 +143,10 @@
 					</nodes>
 				</node>
 				<node code="khxt030200" name="考核人查询" showOrder="2" newpage="false" type="Action" >
-					<action>/reps/khxt/appraise/bkhrlist.mvc</action>
+					<action>/reps/khxt/khrprocess/list.mvc</action>
 					<nodes>
 						<node code="khxt030201" name="评分详情" showOrder="1" newpage="false" type="Operate">
-							<action>/reps/khxt/appraise/toWorkPlan.mvc;</action>
+							<action>/reps/khxt/member/show.mvc;</action>
 						</node>
 					</nodes>
 				</node>

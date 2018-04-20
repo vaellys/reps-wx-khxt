@@ -10,11 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.reps.core.exception.RepsException;
+import com.reps.core.orm.ListResult;
+import com.reps.core.util.DateUtil;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtKhrProcessDao;
 import com.reps.khxt.entity.KhxtKhrProcess;
 import com.reps.khxt.enums.MarkStatus;
 import com.reps.khxt.service.IKhxtKhrProcessService;
+import com.reps.khxt.service.IKhxtLevelPersonService;
 
 @Service
 @Transactional
@@ -24,10 +27,34 @@ public class KhxtKhrProcessServiceImpl implements IKhxtKhrProcessService {
 	
 	@Autowired
 	KhxtKhrProcessDao dao;
+	
+	@Autowired
+	private IKhxtLevelPersonService levelPersonService;
 
 	@Override
 	public List<KhxtKhrProcess> find(KhxtKhrProcess khxtKhrProcess) throws RepsException {
 		return dao.find(khxtKhrProcess);
+	}
+	
+	@Override
+	public ListResult<KhxtKhrProcess> query(int start, int pagesize, KhxtKhrProcess process) throws RepsException {
+		process.setBeginDate(formatDateStr(process.getBeginDate()));
+		process.setEndDate(formatDateStr(process.getEndDate()));
+		ListResult<KhxtKhrProcess> listResult = dao.query(start, pagesize, process);
+		if(null != listResult) {
+			for (KhxtKhrProcess bean : listResult.getList()) {
+				bean.setOrganizeName(levelPersonService.getByPersonId(bean.getKhrPersonId()).getOrganize().getName());
+				bean.getAppraiseSheet().setCheckCompletedMarking(this.checkCompletedMarking(bean.getSheetId(), bean.getKhrPersonId()));
+			}
+		}
+		return listResult;
+	}
+	
+	private String formatDateStr(String dateStr) {
+		if(StringUtil.isNotBlank(dateStr)) {
+			return DateUtil.formatStrDateTime(dateStr, "yyyy年MM月dd日", "yyyyMMdd");
+		}
+		return dateStr;
 	}
 	
 	@Override

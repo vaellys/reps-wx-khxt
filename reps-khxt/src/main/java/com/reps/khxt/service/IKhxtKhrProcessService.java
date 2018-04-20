@@ -3,6 +3,7 @@ package com.reps.khxt.service;
 import java.util.List;
 
 import com.reps.core.exception.RepsException;
+import com.reps.core.orm.ListResult;
 import com.reps.khxt.entity.KhxtKhrProcess;
 
 public interface IKhxtKhrProcessService {
@@ -39,5 +40,15 @@ public interface IKhxtKhrProcessService {
 	 * @throws RepsException
 	 */
 	public boolean checkCompletedMarking(String sheetId, String personId) throws RepsException;
+
+	/**
+	 * 考核人列表查询
+	 * @param start
+	 * @param pagesize
+	 * @param process
+	 * @return
+	 * @throws RepsException
+	 */
+	public ListResult<KhxtKhrProcess> query(int start, int pagesize, KhxtKhrProcess process) throws RepsException;
 
 }

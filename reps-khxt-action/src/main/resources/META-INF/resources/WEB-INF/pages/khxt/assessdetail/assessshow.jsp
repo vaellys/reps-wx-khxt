@@ -29,7 +29,7 @@
 
 					<reps:formfield label="填报截止时间" labelStyle="width:5%"
 					textStyle="width:30%;">
-						${sheet.endEate }
+						${sheet.endDate }
 					</reps:formfield>
 
 					<reps:formfield label="考核人" labelStyle="width:20%;"
