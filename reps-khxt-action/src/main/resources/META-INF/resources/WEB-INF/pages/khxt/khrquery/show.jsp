@@ -65,7 +65,7 @@ table.gridtable td {
 									<td><reps:dialog cssClass="" id="detail" iframe="true"
 											width="600" height="200"
 											url="${ctx }/reps/khxt/member/workdetail.mvc?sheetId=${khxtAppraiseSheet.id }&personId=${member.bkhrPerson.id }"
-											value="${member.bkhrPerson.name }"></reps:dialog><br>
+											value="${member.bkhrPerson.name }" title="${khxtAppraiseSheet.season }份工作人员日常考核量化评分细则"></reps:dialog><br>
 									</td>
 									<c:forEach var="item" items="${items}" varStatus="s">
 										<td>
@@ -102,51 +102,5 @@ table.gridtable td {
 		window.location.href = "${ctx}/reps/khxt/khrprocess/list.mvc";
 	}
 
-	function calculateTotalPoint($obj, index) {
-		var totalPoint = 0;
-		$("input[name^='point" + index + "']").each(function() {
-			var val = parseFloat($(this).val());
-			if (!isNaN(val)) {
-				totalPoint += val;
-			}
-		});
-		$obj.val(totalPoint);
-	}
-
-	function buildMemberAndItemJson() {
-		var memberArray = new Array();
-		$("#gridTable input[name^='totalPoint']:not(:disabled)").each(function() {
-			var memberId = $(this).attr("memberId");
-			var totalPoint = $(this).val();
-			memberArray.push(new Member(memberId, totalPoint));
-		});
-		var memberJsonStr = JSON.stringify(memberArray);
-		$("input[name='memberJson']").val(memberJsonStr);
-
-		var itemPointArray = new Array();
-		$("#gridTable input[name^='point']:not(:disabled)").each(function() {
-			var memberId = $(this).attr("memberId");
-			var itemId = $(this).attr("itemId");
-			var pointId = $(this).attr("pointId");
-			var point = $(this).val();
-			itemPointArray.push(new ItemPoint(memberId, itemId, point, pointId));
-		});
-		var itemPointJsonStr = JSON.stringify(itemPointArray);
-		$("input[name='itemPointJson']").val(itemPointJsonStr);
-
-		return true;
-	}
-
-	function Member(memberId, totalPoint) {
-		this.memberId = memberId;
-		this.totalPoint = totalPoint;
-	}
-
-	function ItemPoint(memberId, itemId, point, pointId) {
-		this.memberId = memberId;
-		this.itemId = itemId;
-		this.point = point;
-		this.pointId = pointId;
-	}
 </script>
 </html>

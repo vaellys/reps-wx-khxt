@@ -68,6 +68,13 @@ public class KhxtKhrProcess extends IdEntity implements Serializable {
 	@Transient
 	private String endDate;
 	
+	/**
+	 * 是否已完成打分
+	 */
+	@JsonIgnore
+	@Transient
+	private boolean checkCompletedMarking;
+	
 	public KhxtAppraiseSheet getAppraiseSheet() {
 		return appraiseSheet;
 	}
@@ -130,6 +137,14 @@ public class KhxtKhrProcess extends IdEntity implements Serializable {
 
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
+	}
+
+	public boolean isCheckCompletedMarking() {
+		return checkCompletedMarking;
+	}
+
+	public void setCheckCompletedMarking(boolean checkCompletedMarking) {
+		this.checkCompletedMarking = checkCompletedMarking;
 	}
 	
 }

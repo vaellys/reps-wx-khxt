@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,7 @@ public class KhxtPerformanceMembersDao {
 					dc.add(Restrictions.eq("person.name", name));
 				}
 			}
+			dc.addOrder(Order.desc("totalPoints"));
 		}
 		return dao.findByCriteria(dc);
 	}

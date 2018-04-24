@@ -189,6 +189,25 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 		return 0 < dao.count(sheetId, khrPersonId, AppraiseStatus.UN_REPORTED.getId(), AppraiseStatus.REPORTED.getId())
 				? false : true;
 	}
+	
+	@Override
+	public KhxtPerformanceMembers findBkhrScoring(KhxtPerformanceMembers member) throws RepsException {
+		String sheetId = member.getSheetId();
+		if(StringUtil.isBlank(sheetId)) {
+			throw new RepsException("参数异常：考核表ID为空");
+		}
+		String bkhrPersonId = member.getBkhrPersonId();
+		if(StringUtil.isBlank(bkhrPersonId)) {
+			throw new RepsException("参数异常：被考核人ID为空");
+		}
+		List<KhxtPerformanceMembers> list = dao.find(member);
+		if(null != list && !list.isEmpty()) {
+			KhxtPerformanceMembers pm = list.get(0);
+			Hibernate.initialize(pm.getPerformancePoints());
+			return pm;
+		}
+		return null;
+	}
 
 	@Override
 	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers members) throws Exception {
@@ -199,7 +218,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 				Hibernate.initialize(member.getPerformancePoints());
 			}
 		}
-		KhxtAppraiseSheet sheet = khxtAppraiseSheetService.get(members.getSheetId(), true);
+		/*KhxtAppraiseSheet sheet = khxtAppraiseSheetService.get(members.getSheetId(), true);
 		// 计算合计
 		Map<String, Double> map = calculateScore(sheet);
 		// 处理考核人显示
@@ -238,7 +257,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 				}
 				break;
 			}
-		}
+		}*/
 		return list;
 	}
 

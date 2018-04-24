@@ -55,7 +55,7 @@ public class KhxtCategoryServiceImpl implements IKhxtCategoryService {
 		if(!khxtItemService.checkItemExistInCategory(id)) {
 			dao.delete(khxtCategory);
 		} else {
-			throw new RepsException("删除类别中包含指标");
+			throw new RepsException("删除类别中包含指标！");
 		}
 	}
 

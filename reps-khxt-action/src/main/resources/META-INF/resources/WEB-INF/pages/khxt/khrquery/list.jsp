@@ -28,7 +28,7 @@
 	<reps:panel id="mybody" dock="center">
 		<reps:grid id="khrList" items="${list}" form="queryForm" var="khr" pagination="${pager}" flagSeq="true">
 			<reps:gridrow>
-				<reps:gridfield title="月考核报表名称" width="25" align="center">${khr.appraiseSheet.name}</reps:gridfield>
+				<reps:gridfield title="月考核报表名称" width="25" align="center">${khr.appraiseSheet.season}${khr.appraiseSheet.name}</reps:gridfield>
 				<reps:gridfield title="姓名" width="15" align="center">${khr.khrPerson.name}</reps:gridfield>
 				<reps:gridfield title="工作单位" width="25" align="center">${khr.organizeName}</reps:gridfield>
 				<reps:gridfield title="打分情况" width="15" align="center"><c:if test="${khr.appraiseSheet.checkCompletedMarking == true }">已完成打分</c:if><c:if test="${khr.appraiseSheet.checkCompletedMarking == false }">未完成打分</c:if></reps:gridfield>

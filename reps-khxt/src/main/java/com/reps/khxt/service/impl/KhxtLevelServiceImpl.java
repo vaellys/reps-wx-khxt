@@ -50,7 +50,7 @@ public class KhxtLevelServiceImpl implements IKhxtLevelService {
 		if (!khxtLevelPersonService.checkLevelPersonExistInLevel(id) && !KhxtGroupService.checkLevelExist(id)) {
 			dao.delete(khxtLevel);
 		} else {
-			throw new RepsException("删除级别中包含人员或者被组引用");
+			throw new RepsException("删除级别中包含人员或者被级别分组所引用！");
 		}
 		
 	}

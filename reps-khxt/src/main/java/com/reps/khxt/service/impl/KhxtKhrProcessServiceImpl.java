@@ -14,6 +14,7 @@ import com.reps.core.orm.ListResult;
 import com.reps.core.util.DateUtil;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.dao.KhxtKhrProcessDao;
+import com.reps.khxt.entity.KhxtAppraiseSheet;
 import com.reps.khxt.entity.KhxtKhrProcess;
 import com.reps.khxt.enums.MarkStatus;
 import com.reps.khxt.service.IKhxtKhrProcessService;
@@ -44,7 +45,9 @@ public class KhxtKhrProcessServiceImpl implements IKhxtKhrProcessService {
 		if(null != listResult) {
 			for (KhxtKhrProcess bean : listResult.getList()) {
 				bean.setOrganizeName(levelPersonService.getByPersonId(bean.getKhrPersonId()).getOrganize().getName());
-				bean.getAppraiseSheet().setCheckCompletedMarking(this.checkCompletedMarking(bean.getSheetId(), bean.getKhrPersonId()));
+				KhxtAppraiseSheet appraiseSheet = bean.getAppraiseSheet();
+				bean.setCheckCompletedMarking(this.checkCompletedMarking(bean.getSheetId(), bean.getKhrPersonId()));
+				appraiseSheet.setSeason(DateUtil.formatStrDateTime(appraiseSheet.getSeason(), "yyyyMM", "yyyy年MM月"));
 			}
 		}
 		return listResult;

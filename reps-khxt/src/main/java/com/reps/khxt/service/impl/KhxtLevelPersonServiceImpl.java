@@ -106,7 +106,7 @@ public class KhxtLevelPersonServiceImpl implements IKhxtLevelPersonService {
 				KhxtLevelPerson khxtLevelPerson = dao.get(id);
 				if(null != khxtLevelPerson) {
 					if(khxtGroupService.checkPersonIdExist(khxtLevelPerson.getPersonId())) {
-						throw new RepsException("所选人员中有被分组的");
+						throw new RepsException("所选人员中包含被分组的人员！");
 					}
 				}
 			}

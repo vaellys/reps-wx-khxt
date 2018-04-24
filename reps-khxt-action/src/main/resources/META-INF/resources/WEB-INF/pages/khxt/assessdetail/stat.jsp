@@ -40,7 +40,21 @@ table.gridtable td {
 <body>
 	<reps:container>
 		<reps:panel  id="top" dock="top" method="post"
-			action="list.mvc?levelId=${levelId }" formId="queryForm">
+			action="${ctx }/reps/khxt/assessdetail/stat.mvc" formId="queryForm">
+			
+			<%-- <reps:formcontent parentLayout="true" style="width:80%;">
+			<reps:formfield label="被考核人" labelStyle="width:20%;" textStyle="width:27%;">
+				<reps:input name="bkhrPersonName" maxLength="20">${member.bkhrPersonName }</reps:input>
+			</reps:formfield>
+			<reps:formfield label="考核人" labelStyle="width:20%;" textStyle="width:27%;" >
+				<reps:input name="khrPersonName" maxLength="20">${member.khrPersonName }</reps:input>
+			</reps:formfield>
+		</reps:formcontent>
+		<reps:querybuttons>
+			<reps:ajaxgrid messageCode="manage.button.query" formId="queryForm"  cssClass="search-form-a"></reps:ajaxgrid>
+			<reps:button cssClass="search-form-a" id="search" value="查询" onClick="query();"></reps:button>
+		</reps:querybuttons> --%>
+		
 			<reps:footbar>
 				<input type="hidden" name="sheetId" value="${sheetId }">
 				<reps:button cssClass="export-a" id="exportExcel" value="导出" onClick="exportExcel();"></reps:button>
@@ -48,8 +62,7 @@ table.gridtable td {
 					action="${ctx}/reps/khxt/appraise/assessslist.mvc" value="返回" />
 			</reps:footbar>
 		</reps:panel>
-		<reps:panel id="myform" dock="top" action="add.mvc" formId="xform"
-			validForm="true">
+		<reps:panel id="myform" dock="center">
 					<table class="gridtable" id="gridTable">
 					<caption style="padding: 8px;font-weight: bold;">${sheet.season }${sheet.name }</caption>
 						<tbody>
@@ -79,7 +92,7 @@ table.gridtable td {
 									<reps:dialog cssClass="" id="detail" iframe="true"
 											width="600" height="200"
 											url="${ctx }/reps/khxt/member/workdetail.mvc?sheetId=${member.sheetId }&personId=${member.bkhrPersonId }"
-											value="${member.bkhrPersonName }"></reps:dialog>
+											value="${member.bkhrPersonName }" title="${sheet.season }份工作人员日常考核量化评分细则"></reps:dialog>
 									</td>
 									</c:if>
 									
@@ -112,7 +125,12 @@ table.gridtable td {
 	var exportExcel = function() {
 		$("#queryForm").attr("action", "export.mvc");
 		$("#queryForm").submit();
-		$("#queryForm").attr("action", "list.mvc");
+		$("#queryForm").attr("action", "${ctx }/reps/khxt/assessdetail/stat.mvc?sheetId=${sheetId}");
+	}
+	
+	var query = function() {
+		$("#queryForm").attr("action", "${ctx }/reps/khxt/assessdetail/stat.mvc");
+		$("#queryForm").submit();
 	}
 </script>
 </body>

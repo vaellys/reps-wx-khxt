@@ -25,7 +25,7 @@
 		<reps:grid id="levelWeightList" items="${list}" form="queryForm" var="levelWeight" pagination="${pager}" flagSeq="true">
 			<reps:gridrow>
 				<reps:gridfield title="考核名称" width="15" align="center">${levelWeight.year}年${levelWeight.name}</reps:gridfield>
-				<reps:gridfield title="适用年度" width="15" align="center">${levelWeight.year}</reps:gridfield>
+				<reps:gridfield title="适用年度" width="15" align="center">${levelWeight.year}年</reps:gridfield>
 				<reps:gridfield title="公开打分明细" width="15" align="center"><c:if test="${levelWeight.visible == '1'}">可见</c:if><c:if test="${levelWeight.visible == '0'}">不可见</c:if></reps:gridfield>
 				<reps:gridfield title="考核权重" width="30" align="center">${levelWeight.weightDisplay}</reps:gridfield>
 				<reps:gridfield title="操作" width="25">

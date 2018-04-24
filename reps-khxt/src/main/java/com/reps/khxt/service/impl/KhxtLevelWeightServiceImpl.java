@@ -55,7 +55,7 @@ public class KhxtLevelWeightServiceImpl implements IKhxtLevelWeightService {
 		if(!khxtAppraiseSheetService.checkWeightExistInSheet(id)) {
 			dao.delete(khxtLevelWeight);
 		} else {
-			throw new RepsException("该权重被引用");
+			throw new RepsException("该权重被月考核表所引用！");
 		}
 	}
 

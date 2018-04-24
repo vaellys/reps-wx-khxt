@@ -47,7 +47,7 @@ public class KhxtItemServiceImpl implements IKhxtItemService {
 		}
 		KhxtItem item = this.get(khxtItem.getId(), true);
 		if (null != item.getSheets() && !item.getSheets().isEmpty()) {
-			throw new RepsException("该指标被引用");
+			throw new RepsException("该指标已经被考核表所引用！");
 		} else {
 			dao.delete(item);
 		}

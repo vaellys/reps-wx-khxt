@@ -58,7 +58,7 @@ table.gridtable td {
 									</th>
 								</c:forEach>
 								<th>合计（<fmt:formatNumber value="${count}"
-										pattern="#00.#" />）
+										pattern="#.#" />）
 								</th>
 							</tr>
 							<c:forEach var="member" items="${performanceMembers}"
@@ -67,7 +67,7 @@ table.gridtable td {
 									<td><reps:dialog cssClass="" id="detail" iframe="true"
 											width="600" height="200"
 											url="workdetail.mvc?sheetId=${member.appraiseSheet.id }&personId=${member.bkhrPerson.id }"
-											value="${member.bkhrPerson.name }"></reps:dialog><br>
+											value="${member.bkhrPerson.name }" title="${khxtAppraiseSheet.season }份工作人员日常考核量化评分细则"></reps:dialog><br>
 									<c:if test="${member.status == 0}"><span> (未上报工作计划)</span></c:if>
 									</td>
 									<c:forEach var="item" items="${items}" varStatus="s">

@@ -80,4 +80,12 @@ public interface IKhxtPerformanceMembersService {
 	 */
 	List<KhxtPerformanceMembers> query(KhxtPerformanceMembers khxtPerformanceMembers) throws Exception;
 
+	/**
+	 * 查询被考核人得分详情
+	 * @param member
+	 * @return KhxtPerformanceMembers
+	 * @throws RepsException
+	 */
+	KhxtPerformanceMembers findBkhrScoring(KhxtPerformanceMembers member) throws RepsException;
+
 }

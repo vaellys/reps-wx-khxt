@@ -109,7 +109,7 @@
 					</nodes>
 				</node>
 				<node code="khxt020200" name="上报月考核" showOrder="2" newpage="false" type="Action" >
-					<action>/reps/khxt/appraise/bkhrlist.mvc</action>
+					<action>/reps/khxt/appraise/bkhrlist.mvc;/reps/khxt/member/scoringdetail.mvc;</action>
 					<nodes>
 						<node code="khxt020201" name="保存工作计划" showOrder="1" newpage="false" type="Operate">
 							<action>/reps/khxt/appraise/toWorkPlan.mvc;/reps/khxt/appraise/addWorkPlan.mvc;</action>

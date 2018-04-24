@@ -10,7 +10,7 @@
 	<reps:container>
 		<reps:panel  id="top" dock="top" >
 		<reps:footbar>
-			<span>单位部门：${levelPerson.organize.name }</span>
+			<span style="margin-right:120px;">姓名：${levelPerson.personName }</span><span>单位部门：${levelPerson.organize.name }</span>
 		</reps:footbar>
 	</reps:panel>
 		<reps:panel id="mybody" dock="center" style="height:200px;">

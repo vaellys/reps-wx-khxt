@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.reps.core.RepsConstant;
 import com.reps.core.commons.Pagination;
+import com.reps.core.util.DateUtil;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
 import com.reps.khxt.vo.CellMergeRange;
@@ -50,6 +51,7 @@ public class StatAction extends BaseAction {
 			List<Map<String, Object>> resultList = statService.computeAssessItem(member);
 			String sheetId = member.getSheetId();
 			KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(sheetId, true);
+			khxtAppraiseSheet.setSeason(DateUtil.formatStrDateTime(khxtAppraiseSheet.getSeason(), "yyyyMM", "yyyy年MM月"));
 			mav.addObject("items", khxtAppraiseSheet.getItem());
 			mav.addObject("sheetId", sheetId);
 			mav.addObject("member", member);
@@ -69,6 +71,7 @@ public class StatAction extends BaseAction {
 		OutputStream out = null;
 		try {
 			KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(sheetId, true);
+			khxtAppraiseSheet.setSeason(DateUtil.formatStrDateTime(khxtAppraiseSheet.getSeason(), "yyyyMM", "yyyy年MM月"));
 			Set<KhxtItem> itemList = khxtAppraiseSheet.getItem();
 			Map<String, Object> resultMap = statService.buildExcelDatas(sheetId);
 			out = response.getOutputStream();

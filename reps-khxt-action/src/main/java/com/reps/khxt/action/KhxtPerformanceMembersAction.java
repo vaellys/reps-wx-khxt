@@ -16,6 +16,7 @@ import com.reps.core.LoginToken;
 import com.reps.core.RepsConstant;
 import com.reps.core.commons.Pagination;
 import com.reps.core.exception.RepsException;
+import com.reps.core.util.DateUtil;
 import com.reps.core.util.StringUtil;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
@@ -59,6 +60,8 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 				throw new RepsException("您还没有登陆！");
 			}
 			KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(khxtPerformanceMembers.getSheetId(), true);
+			
+			khxtAppraiseSheet.setSeason(DateUtil.formatStrDateTime(khxtAppraiseSheet.getSeason(), "yyyyMM", "yyyy年MM月"));
 			mav.addObject("items", khxtAppraiseSheet.getItem());
 			// 设置考核人ID
 			khxtPerformanceMembers.setKhrPersonId(currentToken.getPersonId());
@@ -82,8 +85,10 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 			String khrPersonName = khxtPerformanceMembers.getKhrPersonName();
 			if(StringUtil.isNotBlank(khrPersonName)) {
 				khrPersonName = URLDecoder.decode(khrPersonName, "UTF-8");
+				khxtPerformanceMembers.setKhrPersonName(khrPersonName);
 			}
 			KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(khxtPerformanceMembers.getSheetId(), true);
+			khxtAppraiseSheet.setSeason(DateUtil.formatStrDateTime(khxtAppraiseSheet.getSeason(), "yyyyMM", "yyyy年MM月"));
 			mav.addObject("items", khxtAppraiseSheet.getItem());
 			// 设置考核人ID
 			List<KhxtPerformanceMembers> results = khxtPerformanceMembersService.find(khxtPerformanceMembers, true);
@@ -184,4 +189,23 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 		mav.addObject("list", list);
 		return mav;
 	}
+
+	@RequestMapping(value = "/scoringdetail")
+	public ModelAndView scoringDetail(KhxtPerformanceMembers khxtPerformanceMembers) throws Exception {
+
+		ModelAndView mav = getModelAndView("/khxt/appraise/scoringdetail");
+		LoginToken loginToken = getCurrentToken();
+		if (loginToken == null) {
+			throw new RepsException("请登录");
+		}
+		KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(khxtPerformanceMembers.getSheetId(), true);
+		khxtAppraiseSheet.setSeason(DateUtil.formatStrDateTime(khxtAppraiseSheet.getSeason(), "yyyyMM", "yyyy年MM月"));
+		khxtPerformanceMembers.setBkhrPersonId(loginToken.getPersonId());
+		KhxtPerformanceMembers member = khxtPerformanceMembersService.findBkhrScoring(khxtPerformanceMembers);
+		mav.addObject("member", member);
+		mav.addObject("items", khxtAppraiseSheet.getItem());
+		mav.addObject("sheet", khxtAppraiseSheet);
+		return mav;
+	}
+	
 }
