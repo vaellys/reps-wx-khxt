@@ -37,6 +37,7 @@ import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
 import com.reps.khxt.entity.KhxtAppraiseSheet;
 import com.reps.khxt.entity.KhxtAppraiseSheetFile;
+import com.reps.khxt.entity.KhxtBkhrPoints;
 import com.reps.khxt.entity.KhxtItem;
 import com.reps.khxt.entity.KhxtLevel;
 import com.reps.khxt.entity.KhxtLevelWeight;
@@ -45,6 +46,7 @@ import com.reps.khxt.entity.KhxtPerformanceWork;
 import com.reps.khxt.enums.ProgressStatus;
 import com.reps.khxt.service.IKhxtAppraiseSheetFileService;
 import com.reps.khxt.service.IKhxtAppraiseSheetService;
+import com.reps.khxt.service.IKhxtBkhrPointsService;
 import com.reps.khxt.service.IKhxtGroupService;
 import com.reps.khxt.service.IKhxtItemService;
 import com.reps.khxt.service.IKhxtKhrProcessService;
@@ -93,6 +95,9 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 
 	@Autowired
 	private IKhxtGroupService groupService;
+
+	@Autowired
+	private IKhxtBkhrPointsService pointsService;
 
 	/**
 	 * 月考核列表
@@ -156,7 +161,7 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 		if (StringUtil.isNotBlank(sheet.getName()) || StringUtil.isNotBlank(sheet.getSeason())) {
 			members.setAppraiseSheet(sheet);
 		}
-		List<KhxtPerformanceMembers> list = memberService.find(members);
+		List<KhxtPerformanceMembers> list = memberService.find(members, true);
 		List<KhxtAppraiseSheet> listResult = new ArrayList<>();
 
 		if (!CollectionUtils.isEmpty(list)) {
@@ -745,6 +750,40 @@ public class KhxtAppraiseSheetAction extends BaseAction {
 			e.printStackTrace();
 			logger.error("下载id=" + id + "的资源文件出错");
 		}
+	}
+
+	@RequestMapping("/countScore")
+	public ModelAndView countScore(Pagination page, String sheetId) throws Exception {
+		String personId = getCurrentToken().getPersonId();
+		if (StringUtils.isBlank(personId)) {
+			throw new RepsException("人员信息不存在！");
+		}
+		// 判断该人员是不是需要考核
+		KhxtPerformanceMembers khxtPerformanceMembers = new KhxtPerformanceMembers();
+		khxtPerformanceMembers.setSheetId(sheetId);
+		khxtPerformanceMembers.setBkhrPersonId(personId);
+		if (CollectionUtils.isEmpty(memberService.find(khxtPerformanceMembers, false))) {
+			throw new RepsException("该人员不在考核范围内！");
+		}
+		// 计算被考核人合计分数
+		KhxtAppraiseSheet sheet = sheetService.get(sheetId);
+		Map<String, Double> map = memberService.calculateScore(sheet);
+		float score = 0;
+		for (String key : map.keySet()) {
+			score += map.get(key);
+		}
+
+		KhxtBkhrPoints bkhrPoints = new KhxtBkhrPoints();
+		bkhrPoints.setBkhrPersonId(personId);
+		bkhrPoints.setAppraiseSheet(sheet);
+		bkhrPoints.setSheetId(sheet.getId());
+		bkhrPoints.setTotalPoints(score);
+		
+		pointsService.save(bkhrPoints);
+
+		KhxtAppraiseSheet s = new KhxtAppraiseSheet();
+		ModelAndView mav = bkhrQuery(page, s);
+		return mav;
 	}
 
 }

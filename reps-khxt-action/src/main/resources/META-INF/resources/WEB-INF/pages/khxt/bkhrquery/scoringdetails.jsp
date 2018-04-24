@@ -99,7 +99,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + port +
 			<c:forEach items="${list}"  var="members">
 				<tr id="personScore">
 					<td id="index" align="center"></td>
-					<td align="center">${members.khrPerson.name}</td>
+					<td align="center">${members.khrPersonName}</td>
 					<c:choose>
 					    <c:when test="${not empty  members.performancePoints}">
 							<c:forEach items="${members.performancePoints}"  var="points">

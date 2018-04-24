@@ -31,7 +31,7 @@
 				<reps:gridfield title="月考核报表名称" width="25" align="center">${khr.appraiseSheet.season}${khr.appraiseSheet.name}</reps:gridfield>
 				<reps:gridfield title="姓名" width="15" align="center">${khr.khrPerson.name}</reps:gridfield>
 				<reps:gridfield title="工作单位" width="25" align="center">${khr.organizeName}</reps:gridfield>
-				<reps:gridfield title="打分情况" width="15" align="center"><c:if test="${khr.appraiseSheet.checkCompletedMarking == true }">已完成打分</c:if><c:if test="${khr.appraiseSheet.checkCompletedMarking == false }">未完成打分</c:if></reps:gridfield>
+				<reps:gridfield title="打分情况" width="15" align="center"><c:if test="${khr.checkCompletedMarking == true }">已完成打分</c:if><c:if test="${khr.checkCompletedMarking == false }">未完成打分</c:if></reps:gridfield>
 				<reps:gridfield title="操作" width="15" align="center">
 					<reps:button cssClass="detail-table" action="" value="评分详情" onClick="goToUrl('${ctx }/reps/khxt/member/show.mvc?sheetId=${khr.appraiseSheet.id }&khrPersonId=${khr.khrPerson.id }', 'khrPersonName', '${khr.khrPerson.name}')"></reps:button>
 				</reps:gridfield>

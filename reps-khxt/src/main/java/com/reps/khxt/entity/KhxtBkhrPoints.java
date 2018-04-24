@@ -5,10 +5,9 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reps.core.orm.IdEntity;
 
 /**
@@ -24,15 +23,15 @@ public class KhxtBkhrPoints extends IdEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7024485451444322636L;
+	private static final long serialVersionUID = 7930475947433692809L;
 
 	/** 考核表ID */
 	@Column(name = "sheet_id", nullable = false, length = 32, insertable = false, updatable = false)
 	private String sheetId;
 
 	/** 考核表 */
-	@JsonIgnore
-	@ManyToOne(cascade = {})
+
+	@OneToOne(cascade = {})
 	@JoinColumn(name = "sheet_id")
 	private KhxtAppraiseSheet appraiseSheet;
 
@@ -40,14 +39,8 @@ public class KhxtBkhrPoints extends IdEntity implements Serializable {
 	@Column(name = "bkhr_person_id", length = 32, nullable = false)
 	private String bkhrPersonId;
 
-	/** 被考核人person */
-	/*@JsonIgnore
-	@ManyToOne(cascade = {})
-	@JoinColumn(name = "bkhr_person_id")
-	private Person bkhrPerson;*/
-
 	/** 评定总分 */
-	@JoinColumn(name = "total_points")
+	@Column(name = "total_points")
 	private float totalPoints;
 
 	public String getSheetId() {
@@ -74,14 +67,6 @@ public class KhxtBkhrPoints extends IdEntity implements Serializable {
 		this.bkhrPersonId = bkhrPersonId;
 	}
 
-	/*public Person getBkhrPerson() {
-		return bkhrPerson;
-	}
-
-	public void setBkhrPerson(Person bkhrPerson) {
-		this.bkhrPerson = bkhrPerson;
-	}*/
-
 	public float getTotalPoints() {
 		return totalPoints;
 	}
@@ -89,5 +74,4 @@ public class KhxtBkhrPoints extends IdEntity implements Serializable {
 	public void setTotalPoints(float totalPoints) {
 		this.totalPoints = totalPoints;
 	}
-
 }

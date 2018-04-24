@@ -23,8 +23,10 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reps.core.exception.RepsException;
 import com.reps.core.util.StringUtil;
+import com.reps.khxt.dao.KhxtBkhrPointsDao;
 import com.reps.khxt.dao.KhxtPerformanceMembersDao;
 import com.reps.khxt.entity.KhxtAppraiseSheet;
+import com.reps.khxt.entity.KhxtBkhrPoints;
 import com.reps.khxt.entity.KhxtItem;
 import com.reps.khxt.entity.KhxtKhrProcess;
 import com.reps.khxt.entity.KhxtLevelPerson;
@@ -58,7 +60,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	private IKhxtKhrProcessService khxtKhrProcessService;
 
 	@Autowired
-	private IKhxtLevelPersonService personService;
+	private KhxtBkhrPointsDao khxtBkhrPointsDao;
 
 	@Autowired
 	private IKhxtLevelPersonService khxtLevelPersonService;
@@ -75,11 +77,6 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 		if (null == khxtPerformanceMembers) {
 			throw new RepsException("参数异常");
 		}
-		/*
-		 * String khrPersonId = khxtPerformanceMembers.getKhrPersonId(); if
-		 * (StringUtil.isBlank(khrPersonId)) { throw new
-		 * RepsException("参数异常:考核人ID为空"); }
-		 */
 		List<KhxtPerformanceMembers> resultList = dao.find(khxtPerformanceMembers);
 		if (eager) {
 			if (null != resultList && !resultList.isEmpty()) {
@@ -189,7 +186,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 		return 0 < dao.count(sheetId, khrPersonId, AppraiseStatus.UN_REPORTED.getId(), AppraiseStatus.REPORTED.getId())
 				? false : true;
 	}
-	
+
 	@Override
 	public KhxtPerformanceMembers findBkhrScoring(KhxtPerformanceMembers member) throws RepsException {
 		String sheetId = member.getSheetId();
@@ -210,7 +207,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	}
 
 	@Override
-	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers members) throws Exception {
+	public List<KhxtPerformanceMembers> scoringDetails(KhxtPerformanceMembers members) throws Exception {
 		List<KhxtPerformanceMembers> list = dao.find(members);
 
 		if (null != list && !list.isEmpty()) {
@@ -218,7 +215,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 				Hibernate.initialize(member.getPerformancePoints());
 			}
 		}
-		/*KhxtAppraiseSheet sheet = khxtAppraiseSheetService.get(members.getSheetId(), true);
+		KhxtAppraiseSheet sheet = khxtAppraiseSheetService.get(members.getSheetId(), true);
 		// 计算合计
 		Map<String, Double> map = calculateScore(sheet);
 		// 处理考核人显示
@@ -257,7 +254,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 				}
 				break;
 			}
-		}*/
+		}
 		return list;
 	}
 
@@ -268,12 +265,12 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 		for (KhxtPerformanceMembers members : list) {
 			// 根据personid查询
 			KhxtLevelPerson person = khxtLevelPersonService.getByPersonId(members.getKhrPersonId());
-			if (StringUtils.equals(person.getPersonId(), members.getKhrPerson().getId())) {
+			if (StringUtils.equals(person.getPersonId(), members.getKhrPersonId())) {
 
 				for (Map<String, String> map : jsonweight) {
 					if (StringUtils.equals(map.get("levelId"), person.getLevelId())) {
-						String name = members.getKhrPerson().getName();
-						members.getKhrPerson().setName(name + "(" + map.get("weight") + "%" + ")");
+						String name = members.getKhrPersonName();
+						members.setKhrPersonName(name + "(" + map.get("weight") + "%" + ")");
 					}
 				}
 			}
@@ -284,7 +281,7 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	}
 
 	// 计算合计
-	private Map<String, Double> calculateScore(KhxtAppraiseSheet sheet) throws Exception {
+	public Map<String, Double> calculateScore(KhxtAppraiseSheet sheet) throws Exception {
 		// 转换百分比
 		NumberFormat nf = NumberFormat.getPercentInstance();
 
@@ -353,7 +350,8 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 	/**
 	 * 被考核人查询
 	 */
-	public List<KhxtPerformanceMembers> query(KhxtPerformanceMembers khxtPerformanceMembers) throws Exception {
+	@Override
+	public List<KhxtPerformanceMembers> bkhrList(KhxtPerformanceMembers khxtPerformanceMembers) throws Exception {
 		List<KhxtPerformanceMembers> listResult = dao.find(khxtPerformanceMembers);
 
 		List<KhxtPerformanceMembers> listMembers = new ArrayList<>();
@@ -368,22 +366,15 @@ public class KhxtPerformanceMembersServiceImpl implements IKhxtPerformanceMember
 		for (String key : map.keySet()) {
 
 			KhxtPerformanceMembers members = map.get(key);
-			KhxtLevelPerson person = personService.getByPersonId(members.getBkhrPersonId());
 
-			members.setPersonOrganize(person.getOrganize().getName());
+			KhxtBkhrPoints KhxtBkhrPoints = khxtBkhrPointsDao.getBySheetId(members.getSheetId());
 
-			// 计算本月得分
-			Map<String, Double> score = calculateScore(members.getAppraiseSheet());
-			double total = 0;
-			for (String scorekey : score.keySet()) {
-				total += score.get(scorekey);
+			if (KhxtBkhrPoints != null && KhxtBkhrPoints.getTotalPoints() != 0) {
+				members.setTotalPoints((double) KhxtBkhrPoints.getTotalPoints());
 			}
-			members.setTotalPoints(total);
-
 			listMembers.add(members);
 		}
 
 		return listMembers;
 	}
-
 }

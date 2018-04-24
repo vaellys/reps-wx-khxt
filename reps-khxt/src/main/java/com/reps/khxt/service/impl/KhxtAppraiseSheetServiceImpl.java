@@ -27,6 +27,7 @@ import com.reps.khxt.dao.KhxtAppraiseSheetDao;
 import com.reps.khxt.dao.KhxtAppraiseSheetFileDao;
 import com.reps.khxt.dao.KhxtKhrProcessDao;
 import com.reps.khxt.dao.KhxtLevelDao;
+import com.reps.khxt.dao.KhxtLevelPersonDao;
 import com.reps.khxt.dao.KhxtLevelWeightDao;
 import com.reps.khxt.dao.KhxtPerformanceMembersDao;
 import com.reps.khxt.dao.KhxtPerformancePointDao;
@@ -38,6 +39,7 @@ import com.reps.khxt.entity.KhxtGroup;
 import com.reps.khxt.entity.KhxtItem;
 import com.reps.khxt.entity.KhxtKhrProcess;
 import com.reps.khxt.entity.KhxtLevel;
+import com.reps.khxt.entity.KhxtLevelPerson;
 import com.reps.khxt.entity.KhxtLevelWeight;
 import com.reps.khxt.entity.KhxtPerformanceMembers;
 import com.reps.khxt.entity.KhxtPerformancePoint;
@@ -82,6 +84,9 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 
 	@Autowired
 	private KhxtPerformancePointDao pointDao;
+
+	@Autowired
+	private KhxtLevelPersonDao levelPersonDao;
 
 	@Autowired
 	private KhxtLevelDao levelDao;
@@ -425,26 +430,36 @@ public class KhxtAppraiseSheetServiceImpl implements IKhxtAppraiseSheetService {
 				List<String> bkhrpersonId = getPersonId(group.getBkhr());
 				for (String id : khrpersonId) {
 					Person khrperson = personDao.get(id);
+					KhxtLevelPerson khrLevelPerson = levelPersonDao.getByPersonId(id);
+
 					// 保存考核人打分表
 					KhxtKhrProcess khr = new KhxtKhrProcess();
 					khr.setSheetId(sheet.getId());
 					khr.setAppraiseSheet(sheet);
 					khr.setKhrPersonId(id);
+					khr.setKhrPerson(khrperson);
 					khr.setStatus(0);
 					khrProcessDao.save(khr);
 
 					for (String bkhrPersonId : bkhrpersonId) {
-						Person bkhrPerson = personDao.get(bkhrPersonId);
+						//Person bkhrPerson = personDao.get(bkhrPersonId);
+						KhxtLevelPerson bkhLevelPerson = levelPersonDao.getByPersonId(bkhrPersonId);
 						KhxtPerformanceMembers k = new KhxtPerformanceMembers();
 						// 考核表
 						k.setSheetId(sheet.getId());
 						k.setAppraiseSheet(sheet);
 						// 考核人person
-						k.setKhrPerson(khrperson);
-						k.setKhrPersonId(khrperson.getId());
+						//k.setKhrPerson(khrperson);
+						k.setKhrPersonId(khrLevelPerson.getPersonId());
+						k.setKhrPersonName(khrLevelPerson.getPersonName());
+						k.setKhrPersonSex(khrLevelPerson.getPersonSex());
+						k.setKhrPersonOrganize(khrLevelPerson.getOrganize().getName());
 						// 被考核人person
-						k.setBkhrPersonId(bkhrPerson.getId());
-						k.setBkhrPerson(bkhrPerson);
+						//k.setBkhrPerson(bkhrPerson);
+						k.setBkhrPersonId(bkhLevelPerson.getPersonId());
+						k.setBkhrPersonName(bkhLevelPerson.getPersonName());
+						k.setBkhrPersonSex(bkhLevelPerson.getPersonSex());
+						k.setBkhrPersonOrganize(bkhLevelPerson.getOrganize().getName());
 						k.setStatus(AppraiseStatus.UN_REPORTED.getId());
 						membersDao.save(k);
 

@@ -11,11 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reps.core.orm.IdEntity;
-import com.reps.system.entity.Person;
 
 /**
  * 
@@ -41,22 +39,46 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 	private KhxtAppraiseSheet appraiseSheet;
 
 	/** 考核人ID */
-	@Column(name = "khr_person_id", length = 32, nullable = false, insertable = false, updatable = false)
+	@Column(name = "khr_person_id", length = 32, nullable = false)
 	private String khrPersonId;
 
-	@JsonIgnore
+	/** 考核人性别 */
+	@Column(name = "khr_person_sex", length = 1)
+	private String khrPersonSex;
+
+	/** 考核人姓名 */
+	@Column(name = "khr_person_name", length = 36)
+	private String khrPersonName;
+
+	/** 考核人工作单位 */
+	@Column(name = "khr_person_organize", length = 60)
+	private String khrPersonOrganize;
+
+	/*@JsonIgnore
 	@ManyToOne(cascade = {})
-	@JoinColumn(name = "khr_person_id")
-	private Person khrPerson;
+	@JoinColumn(name = "khr_person_id", insertable = false, updatable = false)
+	private Person khrPerson;*/
 
 	/** 被考核人ID */
-	@Column(name = "bkhr_person_id", length = 32, nullable = false, insertable = false, updatable = false)
+	@Column(name = "bkhr_person_id", length = 32, nullable = false)
 	private String bkhrPersonId;
 
-	@JsonIgnore
+	/** 考核人性别 */
+	@Column(name = "bkhr_person_sex", length = 1)
+	private String bkhrPersonSex;
+
+	/** 考核人姓名 */
+	@Column(name = "bkhr_person_name", length = 36)
+	private String bkhrPersonName;
+
+	/** 考核人工作单位 */
+	@Column(name = "bkhr_person_organize", length = 60)
+	private String bkhrPersonOrganize;
+
+	/*@JsonIgnore
 	@ManyToOne(cascade = {})
-	@JoinColumn(name = "bkhr_person_id")
-	private Person bkhrPerson;
+	@JoinColumn(name = "bkhr_person_id", insertable = false, updatable = false)
+	private Person bkhrPerson;*/
 
 	/** 评定总分 */
 	@Column(name = "total_points")
@@ -74,26 +96,6 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 	@OneToMany(cascade = {}, fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private List<KhxtPerformancePoint> performancePoints;
-
-	@JsonIgnore
-	@Transient
-	private String personOrganize;
-	
-	@JsonIgnore
-	@Transient
-	private String khrPersonName;
-	
-	@JsonIgnore
-	@Transient
-	private String bkhrPersonName;
-
-	public String getPersonOrganize() {
-		return personOrganize;
-	}
-
-	public void setPersonOrganize(String personOrganize) {
-		this.personOrganize = personOrganize;
-	}
 
 	public String getSheetId() {
 		return sheetId;
@@ -151,7 +153,7 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 		this.status = status;
 	}
 
-	public Person getBkhrPerson() {
+	/*public Person getBkhrPerson() {
 		return bkhrPerson;
 	}
 
@@ -165,7 +167,7 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 
 	public void setKhrPerson(Person khrPerson) {
 		this.khrPerson = khrPerson;
-	}
+	}*/
 
 	public List<KhxtPerformancePoint> getPerformancePoints() {
 		return performancePoints;
@@ -173,6 +175,14 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 
 	public void setPerformancePoints(List<KhxtPerformancePoint> performancePoints) {
 		this.performancePoints = performancePoints;
+	}
+
+	public String getKhrPersonSex() {
+		return khrPersonSex;
+	}
+
+	public void setKhrPersonSex(String khrPersonSex) {
+		this.khrPersonSex = khrPersonSex;
 	}
 
 	public String getKhrPersonName() {
@@ -183,6 +193,22 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 		this.khrPersonName = khrPersonName;
 	}
 
+	public String getKhrPersonOrganize() {
+		return khrPersonOrganize;
+	}
+
+	public void setKhrPersonOrganize(String khrPersonOrganize) {
+		this.khrPersonOrganize = khrPersonOrganize;
+	}
+
+	public String getBkhrPersonSex() {
+		return bkhrPersonSex;
+	}
+
+	public void setBkhrPersonSex(String bkhrPersonSex) {
+		this.bkhrPersonSex = bkhrPersonSex;
+	}
+
 	public String getBkhrPersonName() {
 		return bkhrPersonName;
 	}
@@ -190,5 +216,13 @@ public class KhxtPerformanceMembers extends IdEntity implements Serializable {
 	public void setBkhrPersonName(String bkhrPersonName) {
 		this.bkhrPersonName = bkhrPersonName;
 	}
-	
+
+	public String getBkhrPersonOrganize() {
+		return bkhrPersonOrganize;
+	}
+
+	public void setBkhrPersonOrganize(String bkhrPersonOrganize) {
+		this.bkhrPersonOrganize = bkhrPersonOrganize;
+	}
+
 }

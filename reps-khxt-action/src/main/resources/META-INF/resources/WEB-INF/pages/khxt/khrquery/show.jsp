@@ -46,7 +46,7 @@ table.gridtable td {
 						<caption style="padding: 8px;font-weight: bold;">${khxtAppraiseSheet.season }${khxtAppraiseSheet.name }</caption>
 						<tbody>
 							<tr>
-								<th>序号</th>
+								<th>名次</th>
 								<th>被考核人</th>
 								<c:forEach var="item" items="${items}" varStatus="status">
 									<c:set var="count" value="${count+ item.point}" />
@@ -64,8 +64,8 @@ table.gridtable td {
 									<td>${status.count }<br>
 									<td><reps:dialog cssClass="" id="detail" iframe="true"
 											width="600" height="200"
-											url="${ctx }/reps/khxt/member/workdetail.mvc?sheetId=${khxtAppraiseSheet.id }&personId=${member.bkhrPerson.id }"
-											value="${member.bkhrPerson.name }" title="${khxtAppraiseSheet.season }份工作人员日常考核量化评分细则"></reps:dialog><br>
+											url="${ctx }/reps/khxt/member/workdetail.mvc?sheetId=${khxtAppraiseSheet.id }&personId=${member.bkhrPersonId }"
+											value="${member.bkhrPersonName }" title="${khxtAppraiseSheet.season }份工作人员日常考核量化评分细则"></reps:dialog><br>
 									</td>
 									<c:forEach var="item" items="${items}" varStatus="s">
 										<td>

@@ -3,6 +3,7 @@ package com.reps.khxt.action;
 import java.net.URLDecoder;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,8 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 			if (null == currentToken) {
 				throw new RepsException("您还没有登陆！");
 			}
-			KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(khxtPerformanceMembers.getSheetId(), true);
+			KhxtAppraiseSheet khxtAppraiseSheet = khxtAppraiseSheetService.get(khxtPerformanceMembers.getSheetId(),
+					true);
 			
 			khxtAppraiseSheet.setSeason(DateUtil.formatStrDateTime(khxtAppraiseSheet.getSeason(), "yyyyMM", "yyyy年MM月"));
 			mav.addObject("items", khxtAppraiseSheet.getItem());
@@ -77,7 +79,7 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 			return ajax(AjaxStatus.ERROR, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "/show")
 	public Object show(KhxtPerformanceMembers khxtPerformanceMembers) {
 		ModelAndView mav = getModelAndView("/khxt/khrquery/show");
@@ -148,10 +150,13 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 		ModelAndView mav = getModelAndView("/khxt/bkhrquery/list");
 		LoginToken loginToken = getCurrentToken();
 		if (loginToken == null) {
-			throw new RepsException("请登录");
+			throw new RepsException("请登录！");
+		}
+		if (StringUtils.isBlank(loginToken.getPersonId())) {
+			throw new RepsException("被考核人ID不存在！");
 		}
 		khxtPerformanceMembers.setBkhrPersonId(loginToken.getPersonId());
-		List<KhxtPerformanceMembers> listResult = khxtPerformanceMembersService.query(khxtPerformanceMembers);
+		List<KhxtPerformanceMembers> listResult = khxtPerformanceMembersService.bkhrList(khxtPerformanceMembers);
 		// 分页数据
 		mav.addObject("list", listResult);
 		return mav;
@@ -176,7 +181,7 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 			throw new RepsException("请登录");
 		}
 		khxtPerformanceMembers.setBkhrPersonId(loginToken.getPersonId());
-		List<KhxtPerformanceMembers> list = khxtPerformanceMembersService.find(khxtPerformanceMembers);
+		List<KhxtPerformanceMembers> list = khxtPerformanceMembersService.scoringDetails(khxtPerformanceMembers);
 		if (!CollectionUtils.isEmpty(list)) {
 			KhxtPerformanceMembers members = list.get(0);
 
@@ -207,5 +212,4 @@ public class KhxtPerformanceMembersAction extends BaseAction {
 		mav.addObject("sheet", khxtAppraiseSheet);
 		return mav;
 	}
-	
 }

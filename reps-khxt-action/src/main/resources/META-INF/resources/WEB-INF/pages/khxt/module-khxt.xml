@@ -135,7 +135,7 @@
 					<action>/reps/khxt/appraise/assessslist.mvc</action>
 					<nodes>
 						<node code="khxt030101" name="考核表详情" showOrder="1" newpage="false" type="Operate">
-							<action>/reps/khxt/appraise/assessshow.mvc;</action>
+							<action>/reps/khxt/appraise/assessshow.mvc;/reps/khxt/appraise/countScore.mvc;</action>
 						</node>
 						<node code="khxt030102" name="考核结果汇总" showOrder="2" newpage="false" type="Operate">
 							<action>/reps/khxt/assessdetail/stat.mvc;/reps/khxt/assessdetail/export.mvc;</action>

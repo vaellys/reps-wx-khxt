@@ -10,10 +10,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.reps.core.RepsConstant;
 import com.reps.core.commons.Pagination;
 import com.reps.core.orm.ListResult;
-import com.reps.core.util.DateUtil;
 import com.reps.core.web.AjaxStatus;
 import com.reps.core.web.BaseAction;
-import com.reps.khxt.entity.KhxtAppraiseSheet;
 import com.reps.khxt.entity.KhxtKhrProcess;
 import com.reps.khxt.service.IKhxtKhrProcessService;
 

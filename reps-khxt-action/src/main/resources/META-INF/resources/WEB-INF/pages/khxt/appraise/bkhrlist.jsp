@@ -50,8 +50,10 @@
 						<c:if test="${sheet.status == '1'}">
 							<reps:button cssClass="add-table" value="上报" action="../appraise/toWorkPlan.mvc?sheetId=${sheet.id}"></reps:button>
 						</c:if>
-					</c:if>	
-					<reps:button cssClass="detail-table" action="${ctx}/reps/khxt/member/scoringdetail.mvc?sheetId=${sheet.id }" value="得分详情" ></reps:button>	
+					</c:if>		
+					<c:if test="${sheet.status == '2'}">
+						<reps:button cssClass="detail-table" action="${ctx}/reps/khxt/member/scoringdetail.mvc?sheetId=${sheet.id }" value="得分详情" ></reps:button>	
+					</c:if>
 				</reps:gridfield>
 			</reps:gridrow>
 		</reps:grid>

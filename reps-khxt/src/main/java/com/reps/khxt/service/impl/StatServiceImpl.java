@@ -68,7 +68,7 @@ public class StatServiceImpl implements IStatService {
 						Map<String, Object> resultMap = new HashMap<>();
 						resultMap.put("sheetId", sheetId);
 						resultMap.put("bkhrPersonId", id);
-						resultMap.put("bkhrPersonName", memberList.get(0).getBkhrPerson().getName());
+						resultMap.put("bkhrPersonName", memberList.get(0).getBkhrPersonName());
 						// 存储考核指标信息
 						List<Map<String, Object>> itemList = new ArrayList<>();
 						// 收集所有的item对应的指标分数信息
@@ -77,11 +77,11 @@ public class StatServiceImpl implements IStatService {
 						for (KhxtPerformanceMembers member : memberList) {
 							Map<String, Object> memberMap = new HashMap<>();
 							// 获取到人员所对应的级别
-							KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(member.getKhrPerson().getId());
+							KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(member.getKhrPersonId());
 							String levelId = levelPerson.getLevelId();
 							// 查询该级别所对应的权重
 							String weight = WeightUtil.findWeightByLevelId(levelId, member.getAppraiseSheet().getLevelWeight().getWeight());
-							memberMap.put("khrPersonName", setBkhrPersonName(member.getKhrPerson().getName(), weight));
+							memberMap.put("khrPersonName", setBkhrPersonName(member.getKhrPersonName(), weight));
 							List<KhxtPerformancePoint> performancePoints = member.getPerformancePoints();
 							list.addAll(performancePoints);
 							memberMap.put("itemPoints", performancePoints);
@@ -161,7 +161,7 @@ public class StatServiceImpl implements IStatService {
 		Map<String, List<KhxtPerformancePoint>> levelPointMap = new HashMap<>();
 		List<KhxtPerformancePoint> targetList = null;
 		for (KhxtPerformancePoint p : entry.getValue()) {
-			KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(p.getKhxtPerformanceMembers().getKhrPerson().getId());
+			KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(p.getKhxtPerformanceMembers().getKhrPersonId());
 			String levelId = levelPerson.getLevelId();
 			if (levelPointMap.containsKey(levelId)) {
 				levelPointMap.get(levelId).add(p);
@@ -269,11 +269,11 @@ public class StatServiceImpl implements IStatService {
 							Map<String, Object> memberMap = new LinkedHashMap<>();
 							num = i + 1;
 							memberMap.put("serial", i + 1);
-							name = member.getBkhrPerson().getName();
+							name = member.getBkhrPersonName();
 							memberMap.put("bkhrPersonName", name);
-							KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(member.getKhrPerson().getId());
+							KhxtLevelPerson levelPerson = khxtLevelPersonService.getByPersonId(member.getKhrPersonId());
 							String weight = WeightUtil.findWeightByLevelId(levelPerson.getLevelId(), member.getAppraiseSheet().getLevelWeight().getWeight());
-							memberMap.put("khrPersonName", setBkhrPersonName(member.getKhrPerson().getName(), weight));
+							memberMap.put("khrPersonName", setBkhrPersonName(member.getKhrPersonName(), weight));
 							// 增加指标分数
 							for (KhxtItem item : itemList) {
 								for (KhxtPerformancePoint khxtPerformancePoint : member.getPerformancePoints()) {

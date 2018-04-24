@@ -18,7 +18,6 @@ import com.reps.core.util.DateUtil;
 import com.reps.core.util.StringUtil;
 import com.reps.khxt.entity.KhxtAppraiseSheet;
 import com.reps.khxt.entity.KhxtPerformanceMembers;
-import com.reps.system.entity.Person;
 
 /**
  * 
@@ -52,8 +51,6 @@ public class KhxtPerformanceMembersDao {
 	public List<KhxtPerformanceMembers> find(KhxtPerformanceMembers khxtPerformanceMembers) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
 		dc.createAlias("appraiseSheet", "p");
-		dc.createAlias("bkhrPerson", "person");
-		dc.createAlias("khrPerson", "k");
 		if (null != khxtPerformanceMembers) {
 			String khrPersonId = khxtPerformanceMembers.getKhrPersonId();
 			if (StringUtil.isNotBlank(khrPersonId)) {
@@ -73,7 +70,7 @@ public class KhxtPerformanceMembersDao {
 			}
 			String khrPersonName = khxtPerformanceMembers.getKhrPersonName();
 			if(StringUtil.isNotBlank(khrPersonName)) {
-				dc.add(Restrictions.like("k.name", khrPersonName, MatchMode.ANYWHERE));
+				dc.add(Restrictions.like("khrPersonName", khrPersonName, MatchMode.ANYWHERE));
 			}
 			KhxtAppraiseSheet sheet = khxtPerformanceMembers.getAppraiseSheet();
 			if (sheet != null) {
@@ -94,12 +91,10 @@ public class KhxtPerformanceMembersDao {
 					dc.add(Restrictions.eq("p.endDate",	DateUtil.formatStrDateTime(endEate, "yyyy年MM月dd日", "yyyyMMdd")));
 				}
 			}
-			Person bkhrPerson = khxtPerformanceMembers.getBkhrPerson();
-			if (bkhrPerson != null) {
-				String name = bkhrPerson.getName();
-				if (StringUtil.isNotBlank(name)) {
-					dc.add(Restrictions.eq("person.name", name));
-				}
+			String name = khxtPerformanceMembers.getBkhrPersonName();
+
+			if (StringUtil.isNotBlank(name)) {
+				dc.add(Restrictions.eq("bkhrPersonName", name));
 			}
 			dc.addOrder(Order.desc("totalPoints"));
 		}
@@ -110,7 +105,6 @@ public class KhxtPerformanceMembersDao {
 	public List<String> findByGroup(KhxtPerformanceMembers khxtPerformanceMembers) {
 		DetachedCriteria dc = DetachedCriteria.forClass(KhxtPerformanceMembers.class);
 		dc.createAlias("appraiseSheet", "s");
-		dc.createAlias("bkhrPerson", "b");
 		dc.setProjection(Projections.groupProperty("bkhrPersonId"));
 		if (null != khxtPerformanceMembers) {
 			String sheetId = khxtPerformanceMembers.getSheetId();
@@ -119,7 +113,7 @@ public class KhxtPerformanceMembersDao {
 			}
 			String bkhrPersonName = khxtPerformanceMembers.getBkhrPersonName();
 			if(StringUtil.isNotBlank(bkhrPersonName)) {
-				dc.add(Restrictions.like("b.name", bkhrPersonName, MatchMode.ANYWHERE));
+				dc.add(Restrictions.like("bkhrPersonName", bkhrPersonName, MatchMode.ANYWHERE));
 			}
 		}
 		return dc.getExecutableCriteria(dao.getSession()).list();

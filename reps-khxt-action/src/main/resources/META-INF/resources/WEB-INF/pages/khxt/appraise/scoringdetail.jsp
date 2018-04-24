@@ -13,7 +13,7 @@
 			<reps:detail id="itemInfo" borderFlag="true"
 				textBackgroundFlag="false" >
 				<reps:detailfield label="被考核人" fullRow="true"
-					labelStyle="width:20%;">${member.bkhrPerson.name}</reps:detailfield>
+					labelStyle="width:20%;">${member.bkhrPersoName}</reps:detailfield>
 				<c:forEach var="item" items="${items}" varStatus="status">
 					<c:forEach var="point" items="${member.performancePoints}" varStatus="s">
 						<c:if test="${item.id == point.itemId }">

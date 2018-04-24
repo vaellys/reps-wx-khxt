@@ -49,6 +49,8 @@
 				</reps:gridfield>
 				
 				<reps:gridfield title="操作" width="25">
+					<reps:button cssClass="detail-table" action="${ctx }/reps/khxt/appraise/countScore.mvc?sheetId=${sheet.id }" value="统计"></reps:button>					
+					
 					<reps:button cssClass="detail-table" action="assessshow.mvc?sheetId=${sheet.id }&&callbackUrl=assessslist.mvc" value="考核表详情"></reps:button>					
 					
 					<reps:button cssClass="detail-table" action="${ctx }/reps/khxt/assessdetail/stat.mvc?sheetId=${sheet.id }" value="考核结果汇总"></reps:button>

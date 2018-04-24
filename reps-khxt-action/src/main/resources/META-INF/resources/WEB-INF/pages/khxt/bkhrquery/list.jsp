@@ -35,13 +35,13 @@
 			<reps:gridrow>
 				<reps:gridfield title="月考核报表名称" width="15" align="center">${members.appraiseSheet.name}</reps:gridfield>
 				
-				<reps:gridfield title="姓名" width="10" align="center">${members.bkhrPerson.name}</reps:gridfield>
+				<reps:gridfield title="姓名" width="10" align="center">${members.bkhrPersonName}</reps:gridfield>
 				
 				<reps:gridfield title="性别" width="10" align="center">
-					<sys:dictionary src="sex">${members.bkhrPerson.sex}</sys:dictionary>
+					<sys:dictionary src="sex">${members.bkhrPersonSex}</sys:dictionary>
 				</reps:gridfield>
 				
-				<reps:gridfield title="工作单位" width="15" align="center">${members.personOrganize}</reps:gridfield>
+				<reps:gridfield title="工作单位" width="15" align="center">${members.bkhrPersonOrganize}</reps:gridfield>
 					
 				<reps:gridfield title="得分" width="25" align="center">${members.totalPoints}</reps:gridfield>
 
